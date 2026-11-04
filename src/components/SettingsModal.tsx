@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Globe, DollarSign, Clock, Calendar, Check, Gift, Calculator } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { X, Globe, DollarSign, Clock, Calendar, Check, Gift, Calculator, Plus, Minus } from 'lucide-react';
 import { AppLanguage, CountrySystem, FranceDisplayFocus, FranceStatus, SalaryInputMode, SalarySettings } from '../types';
 import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCountryDefaults, getCurrencySymbol, getExchangeRate, SUPPORTED_CURRENCIES } from '../utils/constants';
 import { EarningsCalculator } from '../utils/calculator';
@@ -21,6 +21,149 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleChange = <K extends keyof SalarySettings>(key: K, value: SalarySettings[K]) => {
     onUpdate({ ...settings, [key]: value });
+  };
+
+  // Local string state to prevent mobile "03500" leading-zero and backspace bugs
+  const [salaryInput, setSalaryInput] = useState<string>(() => (settings.salaryAmount ? settings.salaryAmount.toString() : ''));
+  const [wishlistPriceInput, setWishlistPriceInput] = useState<string>(() => (settings.customWishlistPrice ? settings.customWishlistPrice.toString() : ''));
+
+  // Sync state if settings update externally (e.g. clicking autofill defaults or switching country)
+  useEffect(() => {
+    if (Number(salaryInput) !== settings.salaryAmount) {
+      setSalaryInput(settings.salaryAmount ? settings.salaryAmount.toString() : '');
+    }
+  }, [settings.salaryAmount]);
+
+  useEffect(() => {
+    if (Number(wishlistPriceInput) !== settings.customWishlistPrice) {
+      setWishlistPriceInput(settings.customWishlistPrice ? settings.customWishlistPrice.toString() : '');
+    }
+  }, [settings.customWishlistPrice]);
+
+  const handleSalaryInputChange = (raw: string) => {
+    // Keep only numbers and single dot
+    let cleaned = raw.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('');
+    }
+    // Remove leading zeros if followed by non-zero digits (e.g. "03500" -> "3500", but keep "0" or "0.")
+    if (/^0[0-9]+/.test(cleaned)) {
+      cleaned = cleaned.replace(/^0+/, '');
+    }
+    setSalaryInput(cleaned);
+    if (cleaned === '' || cleaned === '.') {
+      handleChange('salaryAmount', 0);
+    } else {
+      const num = parseFloat(cleaned);
+      if (!isNaN(num)) {
+        handleChange('salaryAmount', num);
+      }
+    }
+  };
+
+  const handleSalaryBlur = () => {
+    if (salaryInput === '' || Number(salaryInput) === 0) {
+      setSalaryInput('0');
+      handleChange('salaryAmount', 0);
+    } else {
+      const num = parseFloat(salaryInput) || 0;
+      setSalaryInput(num.toString());
+      handleChange('salaryAmount', num);
+    }
+  };
+
+  const adjustSalary = (delta: number) => {
+    const next = Math.max(0, Math.round((settings.salaryAmount + delta) * 100) / 100);
+    handleChange('salaryAmount', next);
+    setSalaryInput(next.toString());
+  };
+
+  const salaryPills = useMemo(() => {
+    const curr = (settings.salaryCurrency || 'CNY').toUpperCase();
+    const isAnnual = settings.salaryInputMode === 'annual';
+
+    if (curr === 'JPY') {
+      if (isAnnual) {
+        return [
+          { label: '-50万', delta: -500000 },
+          { label: '-10万', delta: -100000 },
+          { label: '+10万', delta: 100000 },
+          { label: '+50万', delta: 500000 },
+          { label: '+100万', delta: 1000000 },
+        ];
+      }
+      return [
+        { label: '-5万', delta: -50000 },
+        { label: '-1万', delta: -10000 },
+        { label: '+1万', delta: 10000 },
+        { label: '+5万', delta: 50000 },
+        { label: '+10万', delta: 100000 },
+      ];
+    }
+
+    if (isAnnual) {
+      return [
+        { label: '-10,000', delta: -10000 },
+        { label: '-5,000', delta: -5000 },
+        { label: '+5,000', delta: 5000 },
+        { label: '+10,000', delta: 10000 },
+        { label: '+20,000', delta: 20000 },
+      ];
+    }
+
+    // Monthly for CNY, EUR, USD, GBP, CHF
+    return [
+      { label: '-500', delta: -500 },
+      { label: '-100', delta: -100 },
+      { label: '+100', delta: 100 },
+      { label: '+500', delta: 500 },
+      { label: '+1,000', delta: 1000 },
+    ];
+  }, [settings.salaryCurrency, settings.salaryInputMode]);
+
+  const baseStep = useMemo(() => {
+    const curr = (settings.salaryCurrency || 'CNY').toUpperCase();
+    const isAnnual = settings.salaryInputMode === 'annual';
+    if (curr === 'JPY') return isAnnual ? 50000 : 5000;
+    return isAnnual ? 500 : 100;
+  }, [settings.salaryCurrency, settings.salaryInputMode]);
+
+  const handleWishlistPriceChange = (raw: string) => {
+    let cleaned = raw.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('');
+    }
+    if (/^0[0-9]+/.test(cleaned)) {
+      cleaned = cleaned.replace(/^0+/, '');
+    }
+    setWishlistPriceInput(cleaned);
+    if (cleaned === '' || cleaned === '.') {
+      handleChange('customWishlistPrice', 0);
+    } else {
+      const num = parseFloat(cleaned);
+      if (!isNaN(num)) {
+        handleChange('customWishlistPrice', num);
+      }
+    }
+  };
+
+  const handleWishlistPriceBlur = () => {
+    if (wishlistPriceInput === '' || Number(wishlistPriceInput) === 0) {
+      setWishlistPriceInput('0');
+      handleChange('customWishlistPrice', 0);
+    } else {
+      const cleanNum = parseFloat(wishlistPriceInput) || 0;
+      setWishlistPriceInput(cleanNum.toString());
+      handleChange('customWishlistPrice', cleanNum);
+    }
+  };
+
+  const adjustWishlistPrice = (delta: number) => {
+    const next = Math.max(0, Math.round((settings.customWishlistPrice + delta) * 100) / 100);
+    handleChange('customWishlistPrice', next);
+    setWishlistPriceInput(next.toString());
   };
 
   const handleCountryChange = (country: CountrySystem) => {
@@ -404,26 +547,78 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-0.5">
-                <label className="text-[11px] text-grayteal">薪资金额</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] text-grayteal">
+                  薪资金额 ({sym} {settings.salaryCurrency})
+                </label>
                 <button
                   type="button"
                   onClick={() => {
                     const defs = getCountryDefaults(settings.countrySystem);
-                    if (defs.salaryAmount) handleChange('salaryAmount', defs.salaryAmount);
+                    if (defs.salaryAmount) {
+                      handleChange('salaryAmount', defs.salaryAmount);
+                      setSalaryInput(defs.salaryAmount.toString());
+                    }
                   }}
-                  className="text-[10px] text-coral hover:underline flex items-center gap-1"
+                  className="text-[10px] text-coral hover:underline flex items-center gap-1 active:scale-95 transition-transform"
                   title="自动重置为该国真实官方中位数月薪/年薪"
                 >
                   <span>↺ 填入该国真实中位数</span>
                 </button>
               </div>
-              <input
-                type="number"
-                value={settings.salaryAmount}
-                onChange={(e) => handleChange('salaryAmount', Number(e.target.value))}
-                className="w-full bg-[#14262A] border border-[#1F3238] text-white text-sm font-mono font-bold rounded-lg px-3 py-1.5 focus:outline-none"
-              />
+
+              {/* Input with Integrated - / + Stepper Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => adjustSalary(-baseStep)}
+                  className="h-10 w-11 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#14262A] hover:bg-[#1C363D] active:bg-coral border border-[#1F3238] text-white transition-colors touch-manipulation select-none active:scale-95"
+                  title={`减少 ${baseStep}`}
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+
+                <div className="relative flex-1">
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-grayteal font-mono text-xs pointer-events-none">
+                    {sym}
+                  </div>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*"
+                    value={salaryInput}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => handleSalaryInputChange(e.target.value)}
+                    onBlur={handleSalaryBlur}
+                    placeholder="输入薪资金额"
+                    className="w-full bg-[#14262A] border border-[#1F3238] focus:border-coral text-white text-base sm:text-sm font-mono font-bold rounded-lg pl-7 pr-3 py-2 focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => adjustSalary(baseStep)}
+                  className="h-10 w-11 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#14262A] hover:bg-[#1C363D] active:bg-coral border border-[#1F3238] text-white transition-colors touch-manipulation select-none active:scale-95"
+                  title={`增加 ${baseStep}`}
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Quick Multi-Step Adjustment Pills (Horizontal scroll on small screens) */}
+              <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-1 scrollbar-none">
+                <span className="text-[10px] text-grayteal whitespace-nowrap mr-0.5">微调:</span>
+                {salaryPills.map((pill, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => adjustSalary(pill.delta)}
+                    className="px-2.5 py-1 text-[11px] font-mono font-medium rounded-md bg-[#122429] hover:bg-[#1A343B] active:bg-coral border border-[#1A333A] hover:border-coral/40 text-gray-200 hover:text-white transition-all whitespace-nowrap touch-manipulation active:scale-95"
+                  >
+                    {pill.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -508,10 +703,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <label className="text-[10px] text-grayteal block mb-0.5">目标金额与币种</label>
                   <div className="flex gap-1.5 items-center">
                     <input
-                      type="number"
-                      value={settings.customWishlistPrice}
-                      onChange={(e) => handleChange('customWishlistPrice', Number(e.target.value))}
-                      className="w-full flex-1 bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1 font-mono"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*"
+                      value={wishlistPriceInput}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => handleWishlistPriceChange(e.target.value)}
+                      onBlur={handleWishlistPriceBlur}
+                      placeholder="金额"
+                      className="w-full flex-1 bg-[#0E2024] border border-[#1F3238] focus:border-coral text-white text-base sm:text-xs rounded px-2 py-1 font-mono focus:outline-none"
                     />
                     <select
                       value={settings.customWishlistCurrency || settings.displayCurrency}
