@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { X, Play, Square, Coffee } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatCurrencyValue, getCurrencySymbol } from '../utils/constants';
+import { AppLanguage } from '../types';
 
 interface PaidBreakModalProps {
   isOpen: boolean;
   onClose: () => void;
   perSecondEarnings: number;
   currency: string;
-  lang: 'zh' | 'fr' | 'en';
+  lang: AppLanguage;
 }
 
 export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({

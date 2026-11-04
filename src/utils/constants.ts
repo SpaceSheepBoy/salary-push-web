@@ -188,6 +188,24 @@ export const MOTIVATIONAL_QUOTES: Record<AppLanguage, string[]> = {
     'getting closer to freedom 📈',
     'paycheck loading... 🏦',
   ],
+  de: [
+    'Weiter so! 💪',
+    'Das Geld fließt 💰',
+    'Jede Sekunde zählt ⏱',
+    'Schritt für Schritt zur Freiheit 🚀',
+    'Bezahlte Kaffeepause ☕️',
+    'Bald ist Wochenende 🏖',
+    'Das Gehalt wächst kontinuierlich 📈',
+  ],
+  ja: [
+    '一歩ずつ前進 💪',
+    'お給料チャージ中 💰',
+    '毎秒があなたの価値 ⏱',
+    '給料日へカウントダウン 🚀',
+    '有給コーヒーブレイク中 ☕️',
+    'もうすぐ週末 🏖',
+    '今日も一日お疲れ様です ✨',
+  ],
 };
 
 export const L10N = {
@@ -254,6 +272,48 @@ export const L10N = {
     equivalence: 'Rewards',
     paydayCountdown: 'Until Payday',
   },
+  de: {
+    appTitle: 'GehaltsRechner',
+    todayEarned: 'Heute verdient',
+    statusWorking: 'Bei der Arbeit',
+    statusOffDuty: 'Feierabend',
+    perSecond: 'Pro Sekunde',
+    hourlyRate: 'Stundensatz',
+    dailyRate: 'Tagessatz',
+    nextRest: 'Nächste Pause',
+    weekend: 'Wochenende',
+    holiday: 'Feiertag',
+    workTenure: 'Betriebszugehörigkeit',
+    yearsUntilRetirement: 'Bis zur Rente',
+    workedToday: 'Gearbeitet',
+    remainingToday: 'Bis Feierabend',
+    doubleClickHint: 'Lokale Daten · Klicke auf ⚙️ für Einstellungen',
+    paidBreakTitle: 'Bezahlte Kaffeepause / WC-Timer',
+    stealthMode: 'Boss-Key (Tarnmodus)',
+    equivalence: 'Belohnung',
+    paydayCountdown: 'Bis zum Zahltag',
+  },
+  ja: {
+    appTitle: '給料チャージャー',
+    todayEarned: '本日の稼ぎ',
+    statusWorking: '勤務中',
+    statusOffDuty: '退勤済',
+    perSecond: '毎秒の稼ぎ',
+    hourlyRate: '時給換算',
+    dailyRate: '日給換算',
+    nextRest: '次の休日',
+    weekend: '週末',
+    holiday: '祝日',
+    workTenure: '勤続年数',
+    yearsUntilRetirement: '定年まで',
+    workedToday: '本日の勤務',
+    remainingToday: '退勤まで',
+    doubleClickHint: '設定はブラウザに保存 · 右上⚙️で設定',
+    paidBreakTitle: '有給休憩 / トイレタイマー',
+    stealthMode: 'ボスキー (ステルスモード)',
+    equivalence: 'ご褒美換算',
+    paydayCountdown: '給料日まで',
+  },
 };
 
 export const DEFAULT_SETTINGS: SalarySettings = {
@@ -261,7 +321,7 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   countrySystem: 'china',
 
   salaryInputMode: 'monthly',
-  salaryAmount: 10000,
+  salaryAmount: 8000, // 🇨🇳 中国城镇在岗职工真实月薪中位数 ~¥8,000
   salaryCurrency: 'CNY',
   displayCurrency: 'CNY',
 
@@ -288,6 +348,15 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   franceMonthlyTransport: 43.2,
   franceRTTDays: 10,
 
+  germanyPensionRate: 9.3,
+  germanyIncludeHealth: true,
+
+  ukPensionRate: 5.0,
+  ukEmployerMatchRate: 3.0,
+
+  japanSocialInsuranceRate: 15.0,
+  japanCommuteAllowance: 10000,
+
   customBenefitName: '401(k) / 福利',
   customBenefitRate: 10,
   customEmployerMatch: true,
@@ -305,6 +374,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
     case 'china':
       return {
         countrySystem: 'china',
+        salaryAmount: 8000, // 真实中位数月薪
         salaryCurrency: 'CNY',
         displayCurrency: 'CNY',
         annualPaidHolidays: 5,
@@ -315,6 +385,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
     case 'france':
       return {
         countrySystem: 'france',
+        salaryAmount: 2500, // 法国全职中位数月薪 ~2 500 € brut
         salaryCurrency: 'EUR',
         displayCurrency: 'EUR',
         annualPaidHolidays: 25,
@@ -323,9 +394,48 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         retirementAge: 64,
         appLanguage: 'fr',
       };
+    case 'germany':
+      return {
+        countrySystem: 'germany',
+        salaryAmount: 3500, // 德国中位数月薪 ~3 500 € brut
+        salaryCurrency: 'EUR',
+        displayCurrency: 'EUR',
+        annualPaidHolidays: 28, // 德国常规 28-30 天带薪年假
+        annualPublicHolidays: 10,
+        germanyPensionRate: 9.3,
+        germanyIncludeHealth: true,
+        retirementAge: 67,
+        appLanguage: 'de',
+      };
+    case 'uk':
+      return {
+        countrySystem: 'uk',
+        salaryAmount: 2900, // 英国中位数月薪 ~£2,900
+        salaryCurrency: 'GBP',
+        displayCurrency: 'GBP',
+        annualPaidHolidays: 20, // 法定 28 天（20 天年假 + 8 天 Bank Holidays）
+        annualPublicHolidays: 8,
+        ukPensionRate: 5.0,
+        ukEmployerMatchRate: 3.0,
+        retirementAge: 66,
+        appLanguage: 'en',
+      };
+    case 'japan':
+      return {
+        countrySystem: 'japan',
+        salaryAmount: 350000, // 日本中位数月薪 ~¥350,000
+        salaryCurrency: 'JPY',
+        displayCurrency: 'JPY',
+        annualPaidHolidays: 14, // 法定有給休暇 10-20 天
+        annualPublicHolidays: 16, // 国民の祝日 16 天
+        japanSocialInsuranceRate: 15.0,
+        retirementAge: 65,
+        appLanguage: 'ja',
+      };
     case 'us':
       return {
         countrySystem: 'us',
+        salaryAmount: 4500, // 美国全职中位数月薪 ~$4,500
         salaryCurrency: 'USD',
         displayCurrency: 'USD',
         annualPaidHolidays: 15,

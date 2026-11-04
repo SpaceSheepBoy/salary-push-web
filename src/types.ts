@@ -1,5 +1,5 @@
-export type CountrySystem = 'china' | 'france' | 'us' | 'custom';
-export type AppLanguage = 'zh' | 'fr' | 'en';
+export type CountrySystem = 'china' | 'france' | 'germany' | 'uk' | 'japan' | 'us' | 'custom';
+export type AppLanguage = 'zh' | 'fr' | 'en' | 'de' | 'ja';
 export type SalaryInputMode = 'monthly' | 'annual';
 export type FranceStatus = 'cadre' | 'non_cadre' | 'fonctionnaire';
 export type FranceDisplayFocus = 'cotisations' | 'net' | 'avantages';
@@ -55,6 +55,18 @@ export interface SalarySettings {
   franceDailyTicketRestaurant: number;
   franceMonthlyTransport: number;
   franceRTTDays: number;
+
+  // Germany Specifics
+  germanyPensionRate: number;
+  germanyIncludeHealth: boolean;
+
+  // UK Specifics
+  ukPensionRate: number;
+  ukEmployerMatchRate: number;
+
+  // Japan Specifics
+  japanSocialInsuranceRate: number;
+  japanCommuteAllowance: number;
 
   // Custom Specifics
   customBenefitName: string;

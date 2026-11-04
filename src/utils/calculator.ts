@@ -1,4 +1,4 @@
-import { BenefitSummary, NextRestInfo, SalarySettings } from '../types';
+import { AppLanguage, BenefitSummary, NextRestInfo, SalarySettings } from '../types';
 import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol } from './constants';
 
 export class EarningsCalculator {
@@ -191,6 +191,49 @@ export class EarningsCalculator {
           formulaText: `Tickets: ${ticketFmt} ${sym}/j + Navigo 50%`,
         };
       }
+    } else if (this.settings.countrySystem === 'germany') {
+      const pensionRate = (this.settings.germanyPensionRate || 9.3) / 100;
+      const totalPensionMonthly = this.monthlySalary * pensionRate * 2.0; // 9.3% AN + 9.3% AG
+      const perSec = (totalPensionMonthly * 12 / this.workingDaysPerYear / this.workHoursPerDay / 3600) * this.exchangeRate;
+      const accumulated = secondsWorked * perSec;
+      const monthlyDisp = totalPensionMonthly * this.exchangeRate;
+      const fmtMonthly = formatCurrencyValue(monthlyDisp, curr, 0);
+
+      return {
+        title: lang === 'zh' ? '德国法定养老' : (lang === 'de' ? 'Rentenbeitrag' : 'German Pension'),
+        todayAccumulated: accumulated,
+        monthlyAmount: monthlyDisp,
+        formulaText: `${fmtMonthly} ${sym}/M · 9.3% AN + 9.3% AG`,
+      };
+    } else if (this.settings.countrySystem === 'uk') {
+      const empRate = (this.settings.ukPensionRate || 5.0) / 100;
+      const matchRate = (this.settings.ukEmployerMatchRate || 3.0) / 100;
+      const totalPensionMonthly = this.monthlySalary * (empRate + matchRate);
+      const perSec = (totalPensionMonthly * 12 / this.workingDaysPerYear / this.workHoursPerDay / 3600) * this.exchangeRate;
+      const accumulated = secondsWorked * perSec;
+      const monthlyDisp = totalPensionMonthly * this.exchangeRate;
+      const fmtMonthly = formatCurrencyValue(monthlyDisp, curr, 0);
+
+      return {
+        title: lang === 'zh' ? '职业年金 Pension' : 'Workplace Pension',
+        todayAccumulated: accumulated,
+        monthlyAmount: monthlyDisp,
+        formulaText: `${sym}${fmtMonthly}/mo · 5% + 3% Match`,
+      };
+    } else if (this.settings.countrySystem === 'japan') {
+      const rate = (this.settings.japanSocialInsuranceRate || 15.0) / 100;
+      const totalMonthly = this.monthlySalary * rate * 2.0; // 厚生年金+健康保険 劳资对半
+      const perSec = (totalMonthly * 12 / this.workingDaysPerYear / this.workHoursPerDay / 3600) * this.exchangeRate;
+      const accumulated = secondsWorked * perSec;
+      const monthlyDisp = totalMonthly * this.exchangeRate;
+      const fmtMonthly = formatCurrencyValue(monthlyDisp, curr, 0);
+
+      return {
+        title: lang === 'zh' ? '日本社会保険' : (lang === 'ja' ? '社会保険(年金+健康)' : 'Social Insurance'),
+        todayAccumulated: accumulated,
+        monthlyAmount: monthlyDisp,
+        formulaText: `${sym}${fmtMonthly}/月 · 厚生年金+健康 折算`,
+      };
     } else {
       const rate = this.settings.customBenefitRate / 100;
       const mult = this.settings.customEmployerMatch ? 2.0 : 1.0;
@@ -380,11 +423,15 @@ export function formatTimeInterval(seconds: number): string {
   return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-export function formatDaysAndTime(seconds: number, lang: 'zh' | 'fr' | 'en'): { days: number; time: string; daySuffix: string } {
+export function formatDaysAndTime(seconds: number, lang: AppLanguage): { days: number; time: string; daySuffix: string } {
   const total = Math.max(0, Math.floor(seconds));
   const days = Math.floor(total / 86400);
   const remaining = total % 86400;
   const time = formatTimeInterval(remaining);
-  const daySuffix = lang === 'zh' ? '天' : (lang === 'fr' ? 'j ' : 'd ');
+  let daySuffix = 'd ';
+  if (lang === 'zh') daySuffix = '天';
+  else if (lang === 'ja') daySuffix = '日';
+  else if (lang === 'fr') daySuffix = 'j ';
+  else if (lang === 'de') daySuffix = 'T ';
   return { days, time, daySuffix };
 }

@@ -112,8 +112,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* Language */}
             <div>
               <label className="text-[11px] text-grayteal block mb-1">界面语言 (Language)</label>
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#14262A] rounded-lg">
-                {(['zh', 'fr', 'en'] as AppLanguage[]).map((lang) => (
+              <div className="grid grid-cols-5 gap-1 p-1 bg-[#14262A] rounded-lg text-center">
+                {(['zh', 'en', 'fr', 'de', 'ja'] as AppLanguage[]).map((lang) => (
                   <button
                     key={lang}
                     onClick={() => handleChange('appLanguage', lang)}
@@ -123,7 +123,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         : 'text-grayteal hover:text-white'
                     }`}
                   >
-                    {lang === 'zh' ? '中文' : lang === 'fr' ? 'Français' : 'English'}
+                    {lang === 'zh'
+                      ? '中文'
+                      : lang === 'en'
+                      ? 'EN'
+                      : lang === 'fr'
+                      ? 'FR'
+                      : lang === 'de'
+                      ? 'DE'
+                      : '日本語'}
                   </button>
                 ))}
               </div>
@@ -137,9 +145,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => handleCountryChange(e.target.value as CountrySystem)}
                 className="w-full bg-[#14262A] border border-[#1F3238] text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-coral"
               >
-                <option value="china">中国 🇨🇳 (五险一金 · 住房公积金)</option>
-                <option value="france">法国 🇫🇷 (Cotisations · RTT · 饭补)</option>
-                <option value="us">美国 🇺🇸 (401k · PTO · 联邦假)</option>
+                <option value="china">中国 🇨🇳 (五险一金 · 住房公积金 · 中位数 ¥8,000)</option>
+                <option value="france">法国 🇫🇷 (Cotisations · RTT · 饭补 · 中位数 2 500 €)</option>
+                <option value="germany">德国 🇩🇪 (Rentenversicherung · 28天假 · 中位数 3 500 €)</option>
+                <option value="uk">英国 🇬🇧 (Workplace Pension · 28天假 · 中位数 £2,900)</option>
+                <option value="japan">日本 🇯🇵 (社会保険 · 16天祝日 · 中位数 ¥350,000)</option>
+                <option value="us">美国 🇺🇸 (401k · PTO · 联邦假 · 中位数 $4,500)</option>
                 <option value="custom">其他/自定义 🌐 (Custom)</option>
               </select>
             </div>
@@ -240,6 +251,42 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {settings.countrySystem === 'germany' && (
+              <div className="pt-2 border-t border-[#182A2E] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white">德国法定养老保险 (Gesetzliche Rentenversicherung)</span>
+                  <span className="text-xs font-mono font-bold text-mint">9.3% 个人 + 9.3% 雇主</span>
+                </div>
+                <p className="text-[10px] text-grayteal">
+                  • 德国养老保险缴费比例为 18.6%（个人与雇主各 9.3%）；年假通常为 28~30 天；法定公休假按 10 天核算。
+                </p>
+              </div>
+            )}
+
+            {settings.countrySystem === 'uk' && (
+              <div className="pt-2 border-t border-[#182A2E] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white">英国职业年金 (Workplace Pension Auto-Enrolment)</span>
+                  <span className="text-xs font-mono font-bold text-mint">5% 个人 + 3% 雇主</span>
+                </div>
+                <p className="text-[10px] text-grayteal">
+                  • 英国自动加入职业年金计划（最低个人 5% + 雇主 3% = 8%）；法定标准休假为 28 天（20 天年假 + 8 天 Bank Holidays）。
+                </p>
+              </div>
+            )}
+
+            {settings.countrySystem === 'japan' && (
+              <div className="pt-2 border-t border-[#182A2E] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white">日本社会保険 (厚生年金+健康保険)</span>
+                  <span className="text-xs font-mono font-bold text-mint">~15% 个人 + 15% 会社</span>
+                </div>
+                <p className="text-[10px] text-grayteal">
+                  • 厚生年金（9.15%）与健康保险（约5%）由公司与个人对半承担；拥有 G7 最高的 16 天国民祝日。
+                </p>
               </div>
             )}
           </div>
@@ -349,7 +396,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             <div>
-              <label className="text-[11px] text-grayteal block mb-0.5">薪资金额</label>
+              <div className="flex items-center justify-between mb-0.5">
+                <label className="text-[11px] text-grayteal">薪资金额</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const defs = getCountryDefaults(settings.countrySystem);
+                    if (defs.salaryAmount) handleChange('salaryAmount', defs.salaryAmount);
+                  }}
+                  className="text-[10px] text-coral hover:underline flex items-center gap-1"
+                  title="自动重置为该国真实官方中位数月薪/年薪"
+                >
+                  <span>↺ 填入该国真实中位数</span>
+                </button>
+              </div>
               <input
                 type="number"
                 value={settings.salaryAmount}
