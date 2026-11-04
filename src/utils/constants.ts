@@ -273,15 +273,15 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
   },
   {
     id: 'iphone',
-    name: 'iPhone 16 Pro',
+    name: 'iPhone 18 Pro',
     icon: '📱',
     unit: '台',
     localizedNames: {
-      zh: 'iPhone 16 Pro',
-      en: 'iPhone 16 Pro',
-      fr: 'iPhone 16 Pro',
-      de: 'iPhone 16 Pro',
-      ja: 'iPhone 16 Pro',
+      zh: 'iPhone 18 Pro',
+      en: 'iPhone 18 Pro',
+      fr: 'iPhone 18 Pro',
+      de: 'iPhone 18 Pro',
+      ja: 'iPhone 18 Pro',
     },
     localizedUnits: {
       zh: '台',
@@ -290,7 +290,7 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
       de: 'Gerät',
       ja: '台',
     },
-    prices: { CNY: 7999, EUR: 1229, USD: 999, GBP: 999, JPY: 159800 },
+    prices: { CNY: 8999, EUR: 1329, USD: 1099, GBP: 1099, JPY: 179800 },
     isGoal: true,
   },
   {

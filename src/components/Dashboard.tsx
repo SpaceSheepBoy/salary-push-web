@@ -264,16 +264,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* 4. Social Benefit / Housing Fund Row */}
-            <div className="flex items-baseline justify-between text-xs">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-grayteal text-[11px]">{benefit.title}</span>
-                <span className="font-mono font-bold text-cyanaccent text-[13px]">
-                  {isEuropean ? `${benefitFormatted} ${sym}` : `${sym}${benefitFormatted}`}
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-baseline justify-between text-xs">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-grayteal text-[11px]">{benefit.title}</span>
+                  <span className="font-mono font-bold text-cyanaccent text-[13px]">
+                    {isEuropean ? `${benefitFormatted} ${sym}` : `${sym}${benefitFormatted}`}
+                  </span>
+                </div>
+                <span className="text-[10px] text-grayteal/80 truncate max-w-[160px] text-right font-mono">
+                  {benefit.formulaText}
                 </span>
               </div>
-              <span className="text-[10px] text-grayteal/80 truncate max-w-[140px] text-right">
-                {benefit.formulaText}
-              </span>
+              {/* Clarification hint to eliminate all doubt */}
+              <div className="text-[9.5px] text-grayteal/70 leading-tight">
+                {calculator.isCountingNet
+                  ? (lang === 'zh'
+                      ? '💡 员工个人代扣社保（上方今日已赚已扣除，为实发到手，无需再减）'
+                      : lang === 'fr'
+                      ? '💡 Part salariale déduite (Le montant en haut est déjà votre Net réel à payer)'
+                      : '💡 Employee deductions (Top amount is already Net take-home, no extra deduction)')
+                  : (lang === 'zh'
+                      ? '💡 员工个人代扣社保（上方今日已赚按税前毛薪累计）'
+                      : lang === 'fr'
+                      ? '💡 Part salariale déduite (Le chrono en haut compte en Brut)'
+                      : '💡 Employee deductions (Top ticker counts in Gross Brut)')}
+              </div>
             </div>
 
             {/* 5. Divider */}

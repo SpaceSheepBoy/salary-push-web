@@ -887,7 +887,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Already-Saved Input (已存/已攒金额) */}
+              {/* Already-Saved Input (已存/已攒金额，纯净输入无需步进器) */}
               <div className="pt-1.5 border-t border-white/[0.04]">
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-[10px] text-grayteal">
@@ -895,14 +895,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </label>
                   <span className="text-[9px] text-mint">计入合并达成进度条</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => adjustWishlistSaved(-100)}
-                    className="h-8 w-9 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-coral border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
-                  >
-                    -100
-                  </button>
+                <div className="relative">
                   <input
                     type="text"
                     inputMode="decimal"
@@ -912,22 +905,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onChange={(e) => handleWishlistSavedChange(e.target.value)}
                     onBlur={handleWishlistSavedBlur}
                     placeholder="已存金额 (默认 0)"
-                    className="flex-1 bg-[#0E2024] border border-[#1F3238] focus:border-mint text-white text-base sm:text-xs rounded px-2 py-1.5 font-mono focus:outline-none"
+                    className="w-full bg-[#0E2024] border border-[#1F3238] focus:border-mint text-white text-base sm:text-xs rounded-xl px-3 py-2 font-mono focus:outline-none pr-14"
                   />
-                  <button
-                    type="button"
-                    onClick={() => adjustWishlistSaved(100)}
-                    className="h-8 w-9 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-mint border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
-                  >
-                    +100
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => adjustWishlistSaved(500)}
-                    className="h-8 w-10 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-mint border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
-                  >
-                    +500
-                  </button>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-grayteal font-mono pointer-events-none">
+                    {settings.customWishlistCurrency || settings.displayCurrency}
+                  </div>
                 </div>
               </div>
               {(settings.customWishlistCurrency || settings.displayCurrency) !== settings.displayCurrency && (
