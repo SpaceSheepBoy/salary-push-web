@@ -2,7 +2,8 @@
 
 > 🚀 实时薪资跳动、带薪摸鱼计算与打工加油神器 (Web & PWA 版本)
 >
-> 🌐 **在线体验**：[https://salary-push-web.vercel.app](https://salary-push-web.vercel.app)
+> 🌐 **在线体验**：[https://salary-push-web.vercel.app](https://salary-push-web.vercel.app)  
+> 🍎 **macOS 原生客户端 (.dmg)**：[前往 GitHub Releases 下载](https://github.com/SpaceSheepBoy/SalaryPush/releases/latest)
 
 ---
 
