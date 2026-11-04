@@ -4,6 +4,20 @@ export type SalaryInputMode = 'monthly' | 'annual';
 export type FranceStatus = 'cadre' | 'non_cadre' | 'fonctionnaire';
 export type FranceDisplayFocus = 'cotisations' | 'net' | 'avantages';
 
+export interface EquivalenceItem {
+  id: string;
+  name: string;
+  icon: string;
+  unit: string;
+  // Prices in CNY, EUR, USD
+  prices: {
+    CNY: number;
+    EUR: number;
+    USD: number;
+  };
+  isGoal?: boolean; // If true, displays progress bar (e.g. AirPods, iPhone)
+}
+
 export interface SalarySettings {
   // Locale & Country
   appLanguage: AppLanguage;
@@ -20,6 +34,7 @@ export interface SalarySettings {
   workStartMinute: number;
   workEndHour: number;
   workEndMinute: number;
+  lunchBreakMinutes: number; // e.g. 60 mins lunch
   workDays: number[]; // 1=Sun, 2=Mon, ..., 7=Sat
 
   // Holidays & Tenure
@@ -46,10 +61,13 @@ export interface SalarySettings {
   customBenefitRate: number;
   customEmployerMatch: boolean;
 
-  // Extra Fun Features
-  paydayDay: number; // 1-31, day of month when salary is paid
+  // Extra Features
+  isMiniMode: boolean;
+  paydayDay: number; // 1-31, day of month
   soundEnabled: boolean;
-  activeEquivalence: 'latte' | 'meal' | 'gas' | 'movie';
+  activeEquivalenceId: string;
+  customWishlistName: string;
+  customWishlistPrice: number;
 }
 
 export interface BenefitSummary {

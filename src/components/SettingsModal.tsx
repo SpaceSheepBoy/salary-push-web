@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, Globe, DollarSign, Clock, Calendar, Check } from 'lucide-react';
+import { X, Globe, DollarSign, Clock, Calendar, Check, Gift, Calculator } from 'lucide-react';
 import { AppLanguage, CountrySystem, FranceDisplayFocus, FranceStatus, SalaryInputMode, SalarySettings } from '../types';
-import { getCountryDefaults, SUPPORTED_CURRENCIES } from '../utils/constants';
+import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCountryDefaults, getCurrencySymbol, SUPPORTED_CURRENCIES } from '../utils/constants';
+import { EarningsCalculator } from '../utils/calculator';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -43,24 +44,64 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const isEuropean = ['EUR', 'CHF'].includes(settings.displayCurrency.toUpperCase());
 
+  // Real-time calculation preview
+  const calc = new EarningsCalculator(settings, 1.0);
+  const sym = getCurrencySymbol(settings.salaryCurrency);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="relative w-full max-w-md my-8 rounded-2xl bg-[#0E2024] border border-[#1F3238] shadow-2xl p-5 text-white max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-md my-6 rounded-2xl bg-[#0E2024] border border-[#1F3238] shadow-2xl p-4 sm:p-5 text-white max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-[#1F3238]">
           <div>
             <h3 className="text-base font-bold text-white">⚙️ 设置 Settings</h3>
-            <p className="text-xs text-grayteal">自定义国家国情、社保公积金、假期与薪酬</p>
+            <p className="text-xs text-grayteal">国家国情、社保公积金、假期与薪酬精准核算</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-grayteal hover:text-white hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-grayteal hover:text-white hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="mt-4 space-y-4">
+          {/* Live Calculation Preview Banner */}
+          <div className="p-3 rounded-xl bg-[#081518] border border-[#1E3E47] space-y-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-mint">
+              <div className="flex items-center gap-1.5">
+                <Calculator className="w-3.5 h-3.5 text-mint" />
+                <span>实时薪酬与工时核算明细 (Calculation Breakdown)</span>
+              </div>
+              <span className="text-[10px] text-grayteal">关联实际假期</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center py-1 bg-[#0E2024] rounded-lg border border-[#162B30]">
+              <div>
+                <div className="text-[10px] text-grayteal">全年出勤工作日</div>
+                <div className="text-xs font-bold font-mono text-white mt-0.5">
+                  {Math.round(calc.workingDaysPerYear)} 天
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-grayteal">核算日薪 (Daily)</div>
+                <div className="text-xs font-bold font-mono text-coral mt-0.5">
+                  {sym}{formatCurrencyValue(calc.dailyEarningsSalaryCurrency, settings.salaryCurrency, 2)}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-grayteal">核算时薪 (Hourly)</div>
+                <div className="text-xs font-bold font-mono text-cyanaccent mt-0.5">
+                  {sym}{formatCurrencyValue(calc.hourlyEarningsSalaryCurrency, settings.salaryCurrency, 2)}
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[10px] text-grayteal leading-relaxed">
+              💡 公式：年薪 ÷ 全年实际出勤日 ({Math.round(calc.workingDaysPerYear)} 天)。您享受的带薪年假和法定假期越多，实际出勤日的日薪和时薪就越高！修改下方假期，金额实时联动更新。
+            </p>
+          </div>
+
           {/* 1. Language & Country */}
           <div className="p-3 rounded-xl bg-[#091417] border border-[#182A2E] space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
@@ -101,9 +142,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <option value="us">美国 🇺🇸 (401k · PTO · 联邦假)</option>
                 <option value="custom">其他/自定义 🌐 (Custom)</option>
               </select>
-              <p className="text-[10px] text-cyanaccent mt-1 leading-relaxed">
-                💡 切换国家会自动推荐填入该国的年假、法定节假日与退休年龄，您依然可以在下方手动随意修改。
-              </p>
             </div>
 
             {/* Country Specific Details */}
@@ -210,7 +248,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="p-3 rounded-xl bg-[#091417] border border-[#182A2E] space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
               <Calendar className="w-3.5 h-3.5 text-coral" />
-              <span>假期与工龄制度 (Holidays - 可手动微调)</span>
+              <span>假期与工龄制度 (Holidays - 自动关联日薪)</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
@@ -322,7 +360,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] text-grayteal block mb-0.5">薪资币种</label>
+                <label className="text-[11px] text-grayteal block mb-0.5">合同币种</label>
                 <select
                   value={settings.salaryCurrency}
                   onChange={(e) => handleChange('salaryCurrency', e.target.value)}
@@ -359,7 +397,59 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </p>
           </div>
 
-          {/* 4. Schedule */}
+          {/* 4. Motivational Rewards & Custom Wishlist */}
+          <div className="p-3 rounded-xl bg-[#091417] border border-[#182A2E] space-y-2.5">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
+              <Gift className="w-3.5 h-3.5 text-amberbadge" />
+              <span>今日已赚实物与心愿单 (Rewards & Wishlist)</span>
+            </div>
+
+            <div>
+              <label className="text-[11px] text-grayteal block mb-1">默认展示的实物奖励</label>
+              <select
+                value={settings.activeEquivalenceId}
+                onChange={(e) => handleChange('activeEquivalenceId', e.target.value)}
+                className="w-full bg-[#14262A] border border-[#1F3238] text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
+              >
+                {EQUIVALENCE_CATALOG.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.icon} {item.name} ({item.unit})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Custom Wishlist item */}
+            <div className="p-2.5 rounded-lg bg-[#14262A] border border-[#1E363D] space-y-2">
+              <div className="text-[11px] font-semibold text-white flex items-center justify-between">
+                <span>✨ 我的私人心愿目标 (定制大件)</span>
+                <span className="text-[10px] text-mint">显示进度%</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-grayteal block mb-0.5">心愿名称</label>
+                  <input
+                    type="text"
+                    value={settings.customWishlistName}
+                    onChange={(e) => handleChange('customWishlistName', e.target.value)}
+                    placeholder="例如 PS5 / 显卡"
+                    className="w-full bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-grayteal block mb-0.5">目标金额 ({sym})</label>
+                  <input
+                    type="number"
+                    value={settings.customWishlistPrice}
+                    onChange={(e) => handleChange('customWishlistPrice', Number(e.target.value))}
+                    className="w-full bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Schedule */}
           <div className="p-3 rounded-xl bg-[#091417] border border-[#182A2E] space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
               <Clock className="w-3.5 h-3.5 text-amberbadge" />
@@ -453,7 +543,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-coral hover:bg-coral/90 text-white font-medium text-sm transition-all shadow-lg shadow-coral/20"
           >
             <Check className="w-4 h-4" />
-            <span>保存并开始进账 (Save & Start)</span>
+            <span>保存并生效 (Save & Apply)</span>
           </button>
         </div>
       </div>

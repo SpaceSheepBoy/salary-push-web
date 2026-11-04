@@ -1,4 +1,4 @@
-import { AppLanguage, CountrySystem, SalarySettings } from '../types';
+import { AppLanguage, CountrySystem, EquivalenceItem, SalarySettings } from '../types';
 
 export interface CurrencyInfo {
   id: string;
@@ -27,7 +27,7 @@ export function getCurrencySymbol(code: string): string {
   return c ? c.symbol : code;
 }
 
-// Currency Formatter adhering to dot for RMB/USD and comma for EUR
+// Decimal and Grouping Separator: Dot for RMB/USD, Comma for EUR
 export function formatCurrencyValue(value: number, currency: string, decimals: number = 2): string {
   const isEuropean = ['EUR', 'CHF', 'SEK', 'NOK', 'DKK'].includes(currency.toUpperCase());
 
@@ -37,11 +37,9 @@ export function formatCurrencyValue(value: number, currency: string, decimals: n
   const decimalPart = parts[1] || '';
 
   if (isEuropean) {
-    // 2 593,91
     const grouped = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     return decimals > 0 ? `${grouped},${decimalPart}` : grouped;
   } else {
-    // 2,593.91
     const grouped = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return decimals > 0 ? `${grouped}.${decimalPart}` : grouped;
   }
@@ -53,6 +51,111 @@ export function formatFullCurrency(value: number, currency: string, decimals: nu
   const isEuropean = ['EUR', 'CHF'].includes(currency.toUpperCase());
   return isEuropean ? `${formatted} ${symbol}` : `${symbol}${formatted}`;
 }
+
+// Rich Motivational Real-World Rewards Catalog
+export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
+  // 1. 日常小确幸 (Daily treats)
+  {
+    id: 'latte',
+    name: '星巴克拿铁',
+    icon: '☕️',
+    unit: '杯',
+    prices: { CNY: 32, EUR: 4.5, USD: 5.5 },
+  },
+  {
+    id: 'boba',
+    name: '喜茶/霸王茶姬',
+    icon: '🧋',
+    unit: '杯',
+    prices: { CNY: 18, EUR: 6.5, USD: 6.0 },
+  },
+  {
+    id: 'meal',
+    name: '豪华打工午餐',
+    icon: '🍱',
+    unit: '顿',
+    prices: { CNY: 38, EUR: 13.0, USD: 15.0 },
+  },
+
+  // 2. 休闲与犒赏 (Entertainment & Fun)
+  {
+    id: 'movie',
+    name: 'IMAX 电影票',
+    icon: '🎬',
+    unit: '张',
+    prices: { CNY: 55, EUR: 14.0, USD: 16.0 },
+  },
+  {
+    id: 'fuel',
+    name: '10升汽车汽油',
+    icon: '⛽️',
+    unit: '桶',
+    prices: { CNY: 82, EUR: 18.5, USD: 11.0 },
+  },
+  {
+    id: 'pet_food',
+    name: '进口优质猫/狗粮',
+    icon: '🐱',
+    unit: '包',
+    prices: { CNY: 160, EUR: 28.0, USD: 30.0 },
+  },
+  {
+    id: 'steam_game',
+    name: 'Steam 3A游戏大作',
+    icon: '🎮',
+    unit: '部',
+    prices: { CNY: 268, EUR: 59.99, USD: 59.99 },
+  },
+  {
+    id: 'massage',
+    name: '周末泰式全身SPA',
+    icon: '💆',
+    unit: '次',
+    prices: { CNY: 198, EUR: 65.0, USD: 75.0 },
+  },
+
+  // 3. 梦想与大件大目标 (Big milestones with progress %)
+  {
+    id: 'airpods',
+    name: 'AirPods Pro 耳机',
+    icon: '🎧',
+    unit: '部',
+    prices: { CNY: 1899, EUR: 279, USD: 249 },
+    isGoal: true,
+  },
+  {
+    id: 'flight',
+    name: '海岛往返度假机票',
+    icon: '🏖',
+    unit: '趟',
+    prices: { CNY: 2500, EUR: 450, USD: 500 },
+    isGoal: true,
+  },
+  {
+    id: 'iphone',
+    name: 'iPhone 16 Pro 手机',
+    icon: '📱',
+    unit: '台',
+    prices: { CNY: 7999, EUR: 1229, USD: 999 },
+    isGoal: true,
+  },
+  {
+    id: 'luxury_bag',
+    name: '心动大牌轻奢包包',
+    icon: '🎒',
+    unit: '只',
+    prices: { CNY: 6000, EUR: 950, USD: 1000 },
+    isGoal: true,
+  },
+  {
+    id: 'custom_wishlist',
+    name: '我的私人心愿单',
+    icon: '✨',
+    unit: '个',
+    prices: { CNY: 2000, EUR: 300, USD: 300 },
+    isGoal: true,
+  },
+];
 
 export const MOTIVATIONAL_QUOTES: Record<AppLanguage, string[]> = {
   zh: [
@@ -106,7 +209,7 @@ export const L10N = {
     doubleClickHint: '数据保存在本地 · 点击右上角进入设置',
     paidBreakTitle: '带薪摸鱼 / 如厕计时器',
     stealthMode: '老板键 (隐身模式)',
-    equivalence: '等价实物',
+    equivalence: '实物激励',
     paydayCountdown: '距发薪日',
   },
   fr: {
@@ -127,7 +230,7 @@ export const L10N = {
     doubleClickHint: 'Données locales · Cliquez sur ⚙️ pour régler',
     paidBreakTitle: 'Chrono Pause Café / Toilettes Payée',
     stealthMode: 'Mode Discret (Boss Key)',
-    equivalence: 'Équivalence',
+    equivalence: 'Récompense',
     paydayCountdown: 'Avant la paie',
   },
   en: {
@@ -148,7 +251,7 @@ export const L10N = {
     doubleClickHint: 'Local data · Click ⚙️ for settings',
     paidBreakTitle: 'Paid Coffee / Bathroom Break Timer',
     stealthMode: 'Stealth Boss Key',
-    equivalence: 'Equivalence',
+    equivalence: 'Rewards',
     paydayCountdown: 'Until Payday',
   },
 };
@@ -166,6 +269,7 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   workStartMinute: 0,
   workEndHour: 18,
   workEndMinute: 0,
+  lunchBreakMinutes: 60,
   workDays: [2, 3, 4, 5, 6], // Mon-Fri
 
   annualPaidHolidays: 5,
@@ -188,9 +292,12 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   customBenefitRate: 10,
   customEmployerMatch: true,
 
+  isMiniMode: false,
   paydayDay: 10,
   soundEnabled: false,
-  activeEquivalence: 'latte',
+  activeEquivalenceId: 'latte',
+  customWishlistName: 'PS5 Pro 游戏机',
+  customWishlistPrice: 4299,
 };
 
 export function getCountryDefaults(country: CountrySystem): Partial<SalarySettings> {

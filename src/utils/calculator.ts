@@ -1,5 +1,5 @@
 import { BenefitSummary, NextRestInfo, SalarySettings } from '../types';
-import { formatCurrencyValue, getCurrencySymbol } from './constants';
+import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol } from './constants';
 
 export class EarningsCalculator {
   settings: SalarySettings;
@@ -28,22 +28,45 @@ export class EarningsCalculator {
     return Math.max(0, (endMin - startMin) / 60);
   }
 
+  /**
+   * Precise working days calculation:
+   * 365 days / 7 = 52.142857 weeks.
+   * Total potential working days = 52.142857 * workDaysPerWeek (e.g. 260.71 for 5-day week).
+   * Minus statutory public holidays (e.g. 11 days).
+   * Minus annual paid leave (e.g. 5-25 days).
+   * Minus French RTT days (if applicable).
+   * Result = actual working days the user sits at work.
+   */
   get workingDaysPerYear(): number {
-    const weeksPerYear = 52.0;
+    const weeksPerYear = 365.25 / 7.0; // 52.1785
     const workDaysPerWeek = this.settings.workDays.length;
-    let totalHolidays = this.settings.annualPaidHolidays + this.settings.annualPublicHolidays;
+    const totalPotentialDays = weeksPerYear * workDaysPerWeek;
+
+    let totalHolidays = Number(this.settings.annualPaidHolidays) + Number(this.settings.annualPublicHolidays);
     if (this.settings.countrySystem === 'france') {
-      totalHolidays += this.settings.franceRTTDays;
+      totalHolidays += Number(this.settings.franceRTTDays);
     }
-    return Math.max(1, weeksPerYear * workDaysPerWeek - totalHolidays);
+    return Math.max(1, totalPotentialDays - totalHolidays);
+  }
+
+  get workingHoursPerYear(): number {
+    return this.workingDaysPerYear * this.workHoursPerDay;
   }
 
   get dailyEarnings(): number {
     return (this.annualSalary / this.workingDaysPerYear) * this.exchangeRate;
   }
 
+  get dailyEarningsSalaryCurrency(): number {
+    return this.workingDaysPerYear > 0 ? this.annualSalary / this.workingDaysPerYear : 0;
+  }
+
   get hourlyEarnings(): number {
     return this.workHoursPerDay > 0 ? this.dailyEarnings / this.workHoursPerDay : 0;
+  }
+
+  get hourlyEarningsSalaryCurrency(): number {
+    return this.workHoursPerDay > 0 ? this.dailyEarningsSalaryCurrency / this.workHoursPerDay : 0;
   }
 
   get perSecondEarnings(): number {
@@ -290,7 +313,6 @@ export class EarningsCalculator {
     };
   }
 
-  // Payday countdown feature
   paydayCountdown(now: Date = new Date()): { days: number; hours: number } {
     const payday = this.settings.paydayDay || 10;
     const target = new Date(now.getFullYear(), now.getMonth(), payday, 0, 0, 0);
@@ -303,39 +325,50 @@ export class EarningsCalculator {
     return { days, hours };
   }
 
-  // Equivalence feature (What did I earn today in coffee/lunch?)
+  // Enhanced Reward / Equivalence System
   salaryEquivalence(earnedToday: number): {
+    item: typeof EQUIVALENCE_CATALOG[0];
     count: number;
-    unit: string;
-    icon: string;
-    name: string;
+    unitPrice: number;
+    isGoal: boolean;
+    progressPercent: number;
+    formattedPrice: string;
   } {
-    // Standard prices in display currency (roughly normalized)
-    const isEUR = this.settings.displayCurrency.toUpperCase() === 'EUR';
-    const isUSD = this.settings.displayCurrency.toUpperCase() === 'USD';
+    const curr = this.settings.displayCurrency.toUpperCase();
+    const activeId = this.settings.activeEquivalenceId || 'latte';
+    let item = EQUIVALENCE_CATALOG.find((i) => i.id === activeId) || EQUIVALENCE_CATALOG[0];
 
-    switch (this.settings.activeEquivalence) {
-      case 'latte': {
-        const price = isEUR ? 4.5 : (isUSD ? 5.5 : 32.0); // Latte price
-        const count = earnedToday / price;
-        return { count, unit: '杯', icon: '☕️', name: '星巴克拿铁' };
-      }
-      case 'meal': {
-        const price = isEUR ? 13.0 : (isUSD ? 15.0 : 40.0); // Lunch meal
-        const count = earnedToday / price;
-        return { count, unit: '顿', icon: '🍱', name: '打工午餐' };
-      }
-      case 'gas': {
-        const price = isEUR ? 1.85 : (isUSD ? 1.0 : 8.5); // Liter of fuel
-        const count = earnedToday / price;
-        return { count, unit: 'L', icon: '⛽️', name: '汽油' };
-      }
-      case 'movie': {
-        const price = isEUR ? 12.0 : (isUSD ? 14.0 : 50.0); // Movie ticket
-        const count = earnedToday / price;
-        return { count, unit: '张', icon: '🎬', name: '电影票' };
+    let unitPrice = 32;
+    if (item.id === 'custom_wishlist') {
+      unitPrice = this.settings.customWishlistPrice || 2000;
+      item = {
+        ...item,
+        name: this.settings.customWishlistName || '我的心愿单',
+      };
+    } else {
+      if (curr === 'EUR') {
+        unitPrice = item.prices.EUR;
+      } else if (curr === 'USD') {
+        unitPrice = item.prices.USD;
+      } else {
+        // Base CNY price, scaled if different currency
+        unitPrice = item.prices.CNY;
       }
     }
+
+    const count = unitPrice > 0 ? earnedToday / unitPrice : 0;
+    const isGoal = Boolean(item.isGoal);
+    const progressPercent = Math.min(100, count * 100);
+    const formattedPrice = formatCurrencyValue(unitPrice, this.settings.displayCurrency, item.prices.EUR % 1 !== 0 ? 2 : 0);
+
+    return {
+      item,
+      count,
+      unitPrice,
+      isGoal,
+      progressPercent,
+      formattedPrice,
+    };
   }
 }
 

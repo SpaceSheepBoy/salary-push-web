@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DEFAULT_SETTINGS } from './utils/constants';
+import { DEFAULT_SETTINGS, EQUIVALENCE_CATALOG } from './utils/constants';
 import { SalarySettings } from './types';
 import { Dashboard } from './components/Dashboard';
 import { SettingsModal } from './components/SettingsModal';
@@ -98,10 +98,14 @@ export default function App() {
   }, [isSettingsOpen, isPaidBreakOpen]);
 
   const cycleEquivalence = () => {
-    const modes: Array<'latte' | 'meal' | 'gas' | 'movie'> = ['latte', 'meal', 'gas', 'movie'];
-    const currentIdx = modes.indexOf(settings.activeEquivalence);
-    const nextMode = modes[(currentIdx + 1) % modes.length];
-    handleUpdateSettings({ ...settings, activeEquivalence: nextMode });
+    const ids = EQUIVALENCE_CATALOG.map((i) => i.id);
+    const currentId = settings.activeEquivalenceId || 'latte';
+    const currentIdx = ids.indexOf(currentId);
+    const nextId = ids[(currentIdx + 1) % ids.length];
+    handleUpdateSettings({
+      ...settings,
+      activeEquivalenceId: nextId,
+    });
   };
 
   const calculator = new EarningsCalculator(settings, exchangeRate);
@@ -125,6 +129,7 @@ export default function App() {
             onOpenPaidBreak={() => setIsPaidBreakOpen(true)}
             onToggleStealth={() => setIsStealthMode(true)}
             onCycleEquivalence={cycleEquivalence}
+            onToggleMini={() => handleUpdateSettings({ ...settings, isMiniMode: !settings.isMiniMode })}
           />
 
           <SettingsModal
