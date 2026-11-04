@@ -1,7 +1,7 @@
 {
-  "name": "上班加油器 · 带薪摸鱼计算器 (WorkFuel)",
+  "name": "上班加油器 · 带薪摸鱼计算器 (SalaryPush)",
   "short_name": "上班加油器",
-  "description": "专为打工人打造的实时进账跳动、带薪摸鱼计算与打工加油神器 · WorkFuel Real-time Salary & Paid Slacking Ticker",
+  "description": "专为打工人打造的实时进账跳动、带薪摸鱼计算与打工加油神器 · SalaryPush Real-time Salary & Paid Slacking Ticker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#091417",

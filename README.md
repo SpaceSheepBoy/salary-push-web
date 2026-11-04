@@ -1,8 +1,8 @@
-# ⚡️ 上班加油器 · 带薪摸鱼计算器 (WorkFuel)
+# ⚡️ 上班加油器 · 带薪摸鱼计算器 (SalaryPush)
 
 <div align="center">
 
-<img src="docs/icon.png" width="128" height="128" alt="WorkFuel Icon" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-bottom: 16px;" />
+<img src="docs/icon.png" width="128" height="128" alt="SalaryPush Icon" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-bottom: 16px;" />
 <br/>
 
 ![Platform Web](https://img.shields.io/badge/Platform-Web%20%7C%20PWA-blue?style=for-the-badge)
