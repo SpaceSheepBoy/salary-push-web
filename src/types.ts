@@ -101,10 +101,16 @@ export interface BenefitSummary {
 
 export interface DayStripItem {
   id: number;
+  weekdayLabel: string;
   dayNumber: string;
   isToday: boolean;
   isWorkDay: boolean;
+  isRestDay: boolean;
+  isPast: boolean;
+  isFuture: boolean;
   isPastOrToday: boolean;
+  restBadgeLabel: string;
+  todayBadgeLabel: string;
 }
 
 export interface NextRestInfo {
@@ -112,4 +118,5 @@ export interface NextRestInfo {
   countdownSeconds: number;
   startDateFormatted: string;
   dayStrips: DayStripItem[];
+  isRestingNow?: boolean;
 }

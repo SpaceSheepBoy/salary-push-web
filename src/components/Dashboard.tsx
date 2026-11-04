@@ -271,40 +271,97 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </span>
               </div>
 
-              <div className="flex items-baseline gap-0.5 font-mono font-bold text-white text-2xl">
-                {restCountdown.days > 0 && (
-                  <>
-                    <span>{restCountdown.days}</span>
-                    <span className="text-lg mr-1">{restCountdown.daySuffix}</span>
-                  </>
-                )}
-                <span>{restCountdown.time}</span>
-              </div>
+              {restInfo.isRestingNow ? (
+                <div className="flex items-center gap-1.5 py-0.5">
+                  <span className="text-xl">🏖️</span>
+                  <span className="font-bold text-amber-300 text-xl tracking-tight">
+                    {l10n.restingNow}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-0.5 font-mono font-bold text-white text-2xl">
+                  {restCountdown.days > 0 && (
+                    <>
+                      <span>{restCountdown.days}</span>
+                      <span className="text-lg mr-1">{restCountdown.daySuffix}</span>
+                    </>
+                  )}
+                  <span>{restCountdown.time}</span>
+                </div>
+              )}
 
               <div className="text-[10px] text-grayteal -mt-1">
                 {restInfo.startDateFormatted}
               </div>
 
-              {/* 7-day pill strip */}
-              <div className="grid grid-cols-7 gap-1 pt-0.5">
+              {/* 7-day natural week pill strip (Mon - Sun) */}
+              <div className="grid grid-cols-7 gap-1 pt-1">
                 {restInfo.dayStrips.map((item) => (
-                  <div key={item.id} className="flex flex-col items-center gap-1">
-                    <div
-                      className={`w-full h-1 rounded-full ${
+                  <div
+                    key={item.id}
+                    className={`flex flex-col items-center py-1.5 px-0.5 rounded-lg transition-all ${
+                      item.isToday
+                        ? 'bg-mint/10 border border-mint/40 shadow-[0_0_8px_rgba(45,212,191,0.2)]'
+                        : item.isRestDay
+                        ? 'bg-[#3A280D]/75 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.15)]'
+                        : 'bg-white/[0.02] border border-white/[0.04]'
+                    }`}
+                  >
+                    {/* 1. Weekday label: 周一, 周二... / Lun, Mar... */}
+                    <span
+                      className={`text-[9px] font-medium leading-none ${
                         item.isToday
-                          ? 'bg-mint'
-                          : item.isWorkDay
-                          ? 'bg-[#182F36]'
-                          : 'bg-[#223E47]'
+                          ? 'text-white font-bold'
+                          : item.isRestDay
+                          ? 'text-amber-400 font-semibold'
+                          : 'text-grayteal'
+                      }`}
+                    >
+                      {item.weekdayLabel}
+                    </span>
+
+                    {/* 2. Status Dash Pill */}
+                    <div
+                      className={`w-full h-1 my-1 rounded-full ${
+                        item.isToday
+                          ? 'bg-mint shadow-[0_0_6px_rgba(45,212,191,0.8)]'
+                          : item.isRestDay
+                          ? 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]'
+                          : item.isPast
+                          ? 'bg-mint/30'
+                          : 'bg-[#182F36]'
                       }`}
                     />
+
+                    {/* 3. Calendar Day Number (e.g. 2, 3, 4, 7) */}
                     <span
-                      className={`text-[9px] font-mono ${
-                        item.isToday ? 'text-white font-bold' : 'text-grayteal'
+                      className={`text-[10px] font-mono leading-none ${
+                        item.isToday
+                          ? 'text-white font-bold'
+                          : item.isRestDay
+                          ? 'text-amber-300 font-semibold'
+                          : 'text-grayteal'
                       }`}
                     >
                       {item.dayNumber}
                     </span>
+
+                    {/* 4. Prominent Badge: "休" for rest days or "今" for today */}
+                    <div className="mt-1 flex items-center justify-center min-h-[14px]">
+                      {item.isToday ? (
+                        <span className="text-[8px] font-bold text-mint bg-mint/20 px-1 py-0.2 rounded leading-tight whitespace-nowrap">
+                          {item.todayBadgeLabel}
+                        </span>
+                      ) : item.isRestDay ? (
+                        <span className="text-[8px] font-bold text-amber-300 bg-amber-400/25 border border-amber-400/40 px-1 py-0.2 rounded leading-tight whitespace-nowrap">
+                          {item.restBadgeLabel}
+                        </span>
+                      ) : (
+                        <span className="text-[8px] text-transparent select-none leading-tight">
+                          ·
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

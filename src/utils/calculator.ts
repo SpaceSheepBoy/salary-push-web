@@ -1,4 +1,4 @@
-import { AppLanguage, BenefitSummary, NextRestInfo, SalarySettings } from '../types';
+import { AppLanguage, BenefitSummary, DayStripItem, NextRestInfo, SalarySettings } from '../types';
 import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol, getExchangeRate } from './constants';
 
 export class EarningsCalculator {
@@ -335,19 +335,52 @@ export class EarningsCalculator {
 
   nextRestInfo(now: Date = new Date()): NextRestInfo {
     const lang = this.settings.appLanguage;
-    const strips = [];
+    const strips: DayStripItem[] = [];
+
+    // 1. Natural week: Monday to Sunday (ISO standard week)
+    const currentDay = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
+
+    const WEEKDAY_NAMES: Record<AppLanguage, string[]> = {
+      zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+      fr: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+      en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      de: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+      ja: ['月', '火', '水', '木', '金', '土', '日'],
+    };
+
+    const REST_BADGES: Record<AppLanguage, { rest: string; today: string }> = {
+      zh: { rest: '休', today: '今' },
+      fr: { rest: 'Repos', today: 'Auj.' },
+      en: { rest: 'Off', today: 'Today' },
+      de: { rest: 'Frei', today: 'Heute' },
+      ja: { rest: '休', today: '今日' },
+    };
+
+    const todayDateNumber = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
     for (let i = 0; i < 7; i++) {
-      const d = new Date(now);
-      d.setDate(d.getDate() + i);
-      const dayOfWeek = d.getDay() + 1;
-      const isWork = this.settings.workDays.includes(dayOfWeek);
+      const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const dayOfWeek1To7 = d.getDay() + 1; // 1=Sun, 2=Mon...
+      const isWork = this.settings.workDays.includes(dayOfWeek1To7);
+      const isToday = dMidnight === todayDateNumber;
+      const isPast = dMidnight < todayDateNumber;
+      const isFuture = dMidnight > todayDateNumber;
+
       strips.push({
         id: i,
+        weekdayLabel: WEEKDAY_NAMES[lang]?.[i] || WEEKDAY_NAMES.en[i],
         dayNumber: String(d.getDate()),
-        isToday: i === 0,
+        isToday,
         isWorkDay: isWork,
-        isPastOrToday: i === 0,
+        isRestDay: !isWork,
+        isPast,
+        isFuture,
+        isPastOrToday: isPast || isToday,
+        restBadgeLabel: REST_BADGES[lang]?.rest || 'Off',
+        todayBadgeLabel: REST_BADGES[lang]?.today || 'Today',
       });
     }
 
@@ -386,16 +419,32 @@ export class EarningsCalculator {
     const month = restStartDate.getMonth() + 1;
     const day = restStartDate.getDate();
     let startDateFormatted = '';
-    if (lang === 'zh') {
-      startDateFormatted = `${month}/${day} 起 · 共 ${restLength} 天`;
-    } else if (lang === 'fr') {
-      startDateFormatted = `Dès le ${day}/${month} · ${restLength} jours`;
-    } else if (lang === 'de') {
-      startDateFormatted = `Ab ${day}.${month}. · ${restLength} Tage`;
-    } else if (lang === 'ja') {
-      startDateFormatted = `${month}月${day}日より · ${restLength}日間`;
+    const isRestingNow = foundOffset === 0;
+
+    if (isRestingNow) {
+      if (lang === 'zh') {
+        startDateFormatted = `正在享受中 · 共 ${restLength} 天`;
+      } else if (lang === 'fr') {
+        startDateFormatted = `En plein repos · ${restLength} jours`;
+      } else if (lang === 'de') {
+        startDateFormatted = `Aktuell frei · ${restLength} Tage`;
+      } else if (lang === 'ja') {
+        startDateFormatted = `休暇満喫中 · 計 ${restLength} 日間`;
+      } else {
+        startDateFormatted = `On break · ${restLength} days`;
+      }
     } else {
-      startDateFormatted = `From ${month}/${day} · ${restLength} days`;
+      if (lang === 'zh') {
+        startDateFormatted = `${month}/${day} 起 · 共 ${restLength} 天`;
+      } else if (lang === 'fr') {
+        startDateFormatted = `Dès le ${day}/${month} · ${restLength} jours`;
+      } else if (lang === 'de') {
+        startDateFormatted = `Ab ${day}.${month}. · ${restLength} Tage`;
+      } else if (lang === 'ja') {
+        startDateFormatted = `${month}月${day}日より · ${restLength}日間`;
+      } else {
+        startDateFormatted = `From ${month}/${day} · ${restLength} days`;
+      }
     }
 
     let targetDate = new Date(restStartDate);
@@ -417,6 +466,7 @@ export class EarningsCalculator {
       countdownSeconds,
       startDateFormatted,
       dayStrips: strips,
+      isRestingNow,
     };
   }
 

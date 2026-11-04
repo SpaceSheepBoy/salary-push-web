@@ -448,6 +448,7 @@ export const L10N = {
     wishlistSavedLabel: '已存金额',
     wishlistRemainingLabel: '还差',
     wishlistTotalLabel: '累计',
+    restingNow: '🏖️ 享受周末中',
   },
   fr: {
     appTitle: 'Booster Salaire',
@@ -492,6 +493,7 @@ export const L10N = {
     wishlistSavedLabel: 'Déjà épargné',
     wishlistRemainingLabel: 'Reste',
     wishlistTotalLabel: 'Total',
+    restingNow: '🏖️ Bon week-end !',
   },
   en: {
     appTitle: 'Work Fuel',
@@ -536,6 +538,7 @@ export const L10N = {
     wishlistSavedLabel: 'Already Saved',
     wishlistRemainingLabel: 'Remaining',
     wishlistTotalLabel: 'Total',
+    restingNow: '🏖️ Enjoying weekend!',
   },
   de: {
     appTitle: 'GehaltsRechner',
@@ -580,6 +583,7 @@ export const L10N = {
     wishlistSavedLabel: 'Bereits gespart',
     wishlistRemainingLabel: 'Noch offen',
     wishlistTotalLabel: 'Gesamt',
+    restingNow: '🏖️ Schönes Wochenende!',
   },
   ja: {
     appTitle: '給料チャージャー',
@@ -624,6 +628,7 @@ export const L10N = {
     wishlistSavedLabel: '現在の貯金額',
     wishlistRemainingLabel: '残り',
     wishlistTotalLabel: '累計',
+    restingNow: '🏖️ 週末を満喫中！',
   },
 };
 
