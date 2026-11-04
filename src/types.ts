@@ -9,6 +9,8 @@ export interface EquivalenceItem {
   name: string;
   icon: string;
   unit: string;
+  localizedNames?: Partial<Record<AppLanguage, string>>;
+  localizedUnits?: Partial<Record<AppLanguage, string>>;
   // Prices in CNY, EUR, USD, GBP, JPY
   prices: {
     CNY: number;

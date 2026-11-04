@@ -60,6 +60,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '星巴克大杯拿铁',
     icon: '☕️',
     unit: '杯',
+    localizedNames: {
+      zh: '星巴克大杯拿铁',
+      en: 'Starbucks Grande Latte',
+      fr: 'Grand Café Latte Starbucks',
+      de: 'Starbucks Grande Latte',
+      ja: 'スターバックス ラテ (G)',
+    },
+    localizedUnits: {
+      zh: '杯',
+      en: 'cup',
+      fr: 'tasse',
+      de: 'Tasse',
+      ja: '杯',
+    },
     prices: { CNY: 32, EUR: 4.8, USD: 5.45, GBP: 3.95, JPY: 540 },
   },
   {
@@ -67,6 +81,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '喜茶/霸王茶姬',
     icon: '🧋',
     unit: '杯',
+    localizedNames: {
+      zh: '喜茶/霸王茶姬',
+      en: 'Artisan Bubble Tea',
+      fr: 'Bubble Tea Artisanal',
+      de: 'Bubble Tea / Milchtee',
+      ja: 'タピオカミルクティー',
+    },
+    localizedUnits: {
+      zh: '杯',
+      en: 'cup',
+      fr: 'verre',
+      de: 'Becher',
+      ja: '杯',
+    },
     prices: { CNY: 18, EUR: 6.8, USD: 6.5, GBP: 5.2, JPY: 680 },
   },
   {
@@ -74,6 +102,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '打工午市套餐',
     icon: '🍱',
     unit: '顿',
+    localizedNames: {
+      zh: '打工午市套餐',
+      en: 'Business Lunch Set',
+      fr: 'Menu Déjeuner Pro',
+      de: 'Business-Mittagsmenü',
+      ja: 'ランチ定食セット',
+    },
+    localizedUnits: {
+      zh: '顿',
+      en: 'meal',
+      fr: 'repas',
+      de: 'Mahlzeit',
+      ja: '食',
+    },
     prices: { CNY: 35, EUR: 14.5, USD: 15.0, GBP: 11.5, JPY: 1100 },
   },
 
@@ -83,6 +125,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '电影院正价票',
     icon: '🎬',
     unit: '张',
+    localizedNames: {
+      zh: '电影院正价票',
+      en: 'Cinema Movie Ticket',
+      fr: 'Place de Cinéma',
+      de: 'Kino-Eintrittskarte',
+      ja: '映画鑑賞チケット',
+    },
+    localizedUnits: {
+      zh: '张',
+      en: 'ticket',
+      fr: 'place',
+      de: 'Ticket',
+      ja: '枚',
+    },
     prices: { CNY: 50, EUR: 13.5, USD: 15.5, GBP: 12.5, JPY: 2000 },
   },
   {
@@ -90,6 +146,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '10升汽车汽油',
     icon: '⛽️',
     unit: '桶',
+    localizedNames: {
+      zh: '10升汽车汽油',
+      en: '10L Car Gasoline',
+      fr: '10 Litres de Carburant',
+      de: '10 Liter Benzin',
+      ja: 'ガソリン 10L',
+    },
+    localizedUnits: {
+      zh: '桶',
+      en: 'tank',
+      fr: 'plein',
+      de: 'Tank',
+      ja: '回',
+    },
     prices: { CNY: 80, EUR: 18.5, USD: 9.5, GBP: 14.5, JPY: 1750 },
   },
   {
@@ -97,6 +167,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '进口优质猫/狗粮',
     icon: '🐱',
     unit: '包',
+    localizedNames: {
+      zh: '进口优质猫/狗粮',
+      en: 'Premium Pet Food (Cat/Dog)',
+      fr: 'Croquettes Premium Chat/Chien',
+      de: 'Premium Haustierfutter',
+      ja: 'プレミアムペットフード',
+    },
+    localizedUnits: {
+      zh: '包',
+      en: 'bag',
+      fr: 'paquet',
+      de: 'Packung',
+      ja: '袋',
+    },
     prices: { CNY: 180, EUR: 26.0, USD: 28.0, GBP: 22.0, JPY: 4200 },
   },
   {
@@ -104,6 +188,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: 'Steam 3A游戏大作',
     icon: '🎮',
     unit: '部',
+    localizedNames: {
+      zh: 'Steam 3A游戏大作',
+      en: 'Steam AAA Game',
+      fr: 'Jeu Vidéo AAA sur Steam',
+      de: 'Steam AAA-Videospiel',
+      ja: 'Steam AAA新作ゲーム',
+    },
+    localizedUnits: {
+      zh: '部',
+      en: 'game',
+      fr: 'jeu',
+      de: 'Spiel',
+      ja: '本',
+    },
     prices: { CNY: 298, EUR: 69.99, USD: 69.99, GBP: 59.99, JPY: 8800 },
   },
   {
@@ -111,6 +209,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '周末全身SPA按摩',
     icon: '💆',
     unit: '次',
+    localizedNames: {
+      zh: '周末全身SPA按摩',
+      en: 'Weekend Full-Body Spa',
+      fr: 'Séance SPA / Massage',
+      de: 'Ganzkörper-Massage / Spa',
+      ja: '極上スパ・マッサージ',
+    },
+    localizedUnits: {
+      zh: '次',
+      en: 'session',
+      fr: 'séance',
+      de: 'Sitzung',
+      ja: '回',
+    },
     prices: { CNY: 198, EUR: 65.0, USD: 75.0, GBP: 55.0, JPY: 7500 },
   },
 
@@ -120,14 +232,42 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: 'AirPods Pro 2',
     icon: '🎧',
     unit: '部',
+    localizedNames: {
+      zh: 'AirPods Pro 2',
+      en: 'AirPods Pro 2',
+      fr: 'AirPods Pro 2',
+      de: 'AirPods Pro 2',
+      ja: 'AirPods Pro 2',
+    },
+    localizedUnits: {
+      zh: '部',
+      en: 'unit',
+      fr: 'paire',
+      de: 'Stück',
+      ja: '台',
+    },
     prices: { CNY: 1899, EUR: 279, USD: 249, GBP: 229, JPY: 39800 },
     isGoal: true,
   },
   {
     id: 'ps5',
-    name: 'PS5 游戏机 (光驱版)',
+    name: 'PS5 Pro 游戏机',
     icon: '🕹️',
     unit: '台',
+    localizedNames: {
+      zh: 'PS5 Pro 游戏机',
+      en: 'PlayStation 5 Console',
+      fr: 'Console PlayStation 5 Pro',
+      de: 'PlayStation 5 Konsole',
+      ja: 'PlayStation 5 本体',
+    },
+    localizedUnits: {
+      zh: '台',
+      en: 'console',
+      fr: 'console',
+      de: 'Konsole',
+      ja: '台',
+    },
     prices: { CNY: 3599, EUR: 549, USD: 499, GBP: 479, JPY: 79980 },
     isGoal: true,
   },
@@ -136,6 +276,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: 'iPhone 16 Pro',
     icon: '📱',
     unit: '台',
+    localizedNames: {
+      zh: 'iPhone 16 Pro',
+      en: 'iPhone 16 Pro',
+      fr: 'iPhone 16 Pro',
+      de: 'iPhone 16 Pro',
+      ja: 'iPhone 16 Pro',
+    },
+    localizedUnits: {
+      zh: '台',
+      en: 'unit',
+      fr: 'appareil',
+      de: 'Gerät',
+      ja: '台',
+    },
     prices: { CNY: 7999, EUR: 1229, USD: 999, GBP: 999, JPY: 159800 },
     isGoal: true,
   },
@@ -144,6 +298,20 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '海岛往返度假机票',
     icon: '🏖',
     unit: '趟',
+    localizedNames: {
+      zh: '海岛往返度假机票',
+      en: 'Round-Trip Island Flight',
+      fr: 'Billet d\'avion A/R Vacances',
+      de: 'Hin- & Rückflug Urlaubsinsel',
+      ja: 'リゾート往復航空券',
+    },
+    localizedUnits: {
+      zh: '趟',
+      en: 'trip',
+      fr: 'voyage',
+      de: 'Reise',
+      ja: '往復',
+    },
     prices: { CNY: 2600, EUR: 450, USD: 500, GBP: 380, JPY: 68000 },
     isGoal: true,
   },
@@ -152,10 +320,38 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '我的私人心愿单',
     icon: '✨',
     unit: '个',
+    localizedNames: {
+      zh: '我的私人心愿单',
+      en: 'My Private Wishlist',
+      fr: 'Mon Objectif Personnel',
+      de: 'Mein Sparziel',
+      ja: '私のウィッシュリスト',
+    },
+    localizedUnits: {
+      zh: '个',
+      en: 'goal',
+      fr: 'projet',
+      de: 'Ziel',
+      ja: '個',
+    },
     prices: { CNY: 3599, EUR: 549, USD: 499, GBP: 479, JPY: 79980 },
     isGoal: true,
   },
 ];
+
+export function getEquivalenceName(item: EquivalenceItem, lang: AppLanguage): string {
+  if (item.localizedNames && item.localizedNames[lang]) {
+    return item.localizedNames[lang]!;
+  }
+  return item.name;
+}
+
+export function getEquivalenceUnit(item: EquivalenceItem, lang: AppLanguage): string {
+  if (item.localizedUnits && item.localizedUnits[lang]) {
+    return item.localizedUnits[lang]!;
+  }
+  return item.unit;
+}
 
 export const MOTIVATIONAL_QUOTES: Record<AppLanguage, string[]> = {
   zh: [
@@ -217,6 +413,7 @@ export const L10N = {
     perSecond: '每秒进账',
     hourlyRate: '时薪',
     dailyRate: '日薪',
+    annualSalary: '年薪',
     monthEarned: '本月已赚',
     monthProgress: '完成',
     nextRest: '下一个休息',
@@ -251,6 +448,7 @@ export const L10N = {
     perSecond: 'Par seconde',
     hourlyRate: 'Taux horaire',
     dailyRate: 'Par jour',
+    annualSalary: 'Par an',
     monthEarned: 'Ce mois',
     monthProgress: 'Progression',
     nextRest: 'Prochain repos',
@@ -285,6 +483,7 @@ export const L10N = {
     perSecond: 'Per second',
     hourlyRate: 'Hourly',
     dailyRate: 'Daily',
+    annualSalary: 'Per year',
     monthEarned: 'This Month',
     monthProgress: 'Progress',
     nextRest: 'Next rest',
@@ -319,6 +518,7 @@ export const L10N = {
     perSecond: 'Pro Sekunde',
     hourlyRate: 'Stundensatz',
     dailyRate: 'Tagessatz',
+    annualSalary: 'Pro Jahr',
     monthEarned: 'Diesen Monat',
     monthProgress: 'Fortschritt',
     nextRest: 'Nächste Pause',
@@ -353,6 +553,7 @@ export const L10N = {
     perSecond: '毎秒の稼ぎ',
     hourlyRate: '時給換算',
     dailyRate: '日給換算',
+    annualSalary: '年収',
     monthEarned: '今月の稼ぎ',
     monthProgress: '達成率',
     nextRest: '次の休日',

@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Globe, DollarSign, Clock, Calendar, Check, Gift, Calculator, Plus, Minus } from 'lucide-react';
 import { AppLanguage, CountrySystem, FranceDisplayFocus, FranceStatus, SalaryInputMode, SalarySettings } from '../types';
-import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCountryDefaults, getCurrencySymbol, getExchangeRate, SUPPORTED_CURRENCIES } from '../utils/constants';
+import {
+  EQUIVALENCE_CATALOG,
+  formatCurrencyValue,
+  getCountryDefaults,
+  getCurrencySymbol,
+  getExchangeRate,
+  SUPPORTED_CURRENCIES,
+  getEquivalenceName,
+  getEquivalenceUnit,
+} from '../utils/constants';
 import { EarningsCalculator } from '../utils/calculator';
 
 interface SettingsModalProps {
@@ -77,6 +86,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const next = Math.max(0, Math.round((settings.salaryAmount + delta) * 100) / 100);
     handleChange('salaryAmount', next);
     setSalaryInput(next.toString());
+  };
+
+  const switchSalaryInputMode = (newMode: SalaryInputMode) => {
+    if (newMode === settings.salaryInputMode) return;
+    const currentAmount = settings.salaryAmount || 0;
+    let newAmount = currentAmount;
+    if (settings.salaryInputMode === 'monthly' && newMode === 'annual') {
+      newAmount = Math.round(currentAmount * 12);
+    } else if (settings.salaryInputMode === 'annual' && newMode === 'monthly') {
+      newAmount = Math.round(currentAmount / 12);
+    }
+    onUpdate({
+      ...settings,
+      salaryInputMode: newMode,
+      salaryAmount: newAmount,
+    });
+    setSalaryInput(newAmount.toString());
   };
 
   const salaryPills = useMemo(() => {
@@ -525,7 +551,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#14262A] rounded-lg">
               <button
-                onClick={() => handleChange('salaryInputMode', 'monthly')}
+                type="button"
+                onClick={() => switchSalaryInputMode('monthly')}
                 className={`py-1 text-xs font-medium rounded-md transition-all ${
                   settings.salaryInputMode === 'monthly'
                     ? 'bg-coral text-white shadow'
@@ -535,7 +562,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 月薪 Monthly
               </button>
               <button
-                onClick={() => handleChange('salaryInputMode', 'annual')}
+                type="button"
+                onClick={() => switchSalaryInputMode('annual')}
                 className={`py-1 text-xs font-medium rounded-md transition-all ${
                   settings.salaryInputMode === 'annual'
                     ? 'bg-coral text-white shadow'
@@ -676,7 +704,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               >
                 {EQUIVALENCE_CATALOG.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.icon} {item.name} ({item.unit})
+                    {item.icon} {getEquivalenceName(item, settings.appLanguage)} ({getEquivalenceUnit(item, settings.appLanguage)})
                   </option>
                 ))}
               </select>

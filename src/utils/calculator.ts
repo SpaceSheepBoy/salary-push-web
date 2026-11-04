@@ -16,6 +16,10 @@ export class EarningsCalculator {
       : this.settings.salaryAmount;
   }
 
+  get annualEarnings(): number {
+    return this.annualSalary * this.exchangeRate;
+  }
+
   get monthlySalary(): number {
     return this.settings.salaryInputMode === 'monthly'
       ? this.settings.salaryAmount
@@ -320,8 +324,8 @@ export class EarningsCalculator {
     const restDayOfWeek = restStartDate.getDay() + 1;
     const isWeekend = restDayOfWeek === 1 || restDayOfWeek === 7;
     const badgeName = isWeekend
-      ? (lang === 'zh' ? '周末' : (lang === 'fr' ? 'Week-end' : 'Weekend'))
-      : (lang === 'zh' ? '假期' : (lang === 'fr' ? 'Férié' : 'Holiday'));
+      ? (lang === 'zh' ? '周末' : (lang === 'fr' ? 'Week-end' : (lang === 'de' ? 'Wochenende' : (lang === 'ja' ? '週末' : 'Weekend'))))
+      : (lang === 'zh' ? '假期' : (lang === 'fr' ? 'Férié' : (lang === 'de' ? 'Feiertag' : (lang === 'ja' ? '祝日' : 'Holiday'))));
 
     const month = restStartDate.getMonth() + 1;
     const day = restStartDate.getDate();
@@ -330,6 +334,10 @@ export class EarningsCalculator {
       startDateFormatted = `${month}/${day} 起 · 共 ${restLength} 天`;
     } else if (lang === 'fr') {
       startDateFormatted = `Dès le ${day}/${month} · ${restLength} jours`;
+    } else if (lang === 'de') {
+      startDateFormatted = `Ab ${day}.${month}. · ${restLength} Tage`;
+    } else if (lang === 'ja') {
+      startDateFormatted = `${month}月${day}日より · ${restLength}日間`;
     } else {
       startDateFormatted = `From ${month}/${day} · ${restLength} days`;
     }

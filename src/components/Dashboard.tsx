@@ -10,6 +10,8 @@ import {
   formatTenureText,
   formatRetirementYearsText,
   formatPaydayDayText,
+  getEquivalenceName,
+  getEquivalenceUnit,
 } from '../utils/constants';
 
 interface DashboardProps {
@@ -153,9 +155,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* 2. Big Animated Number (Coral pink, 2 decimals, dot for RMB/USD, comma for EUR) */}
+        {/* 2. Big Animated Number (Golden yellow with cash emoji 💰, 2 decimals, dot for RMB/USD, comma for EUR) */}
         <div className="flex flex-col items-center justify-center text-center pt-0.5">
-          <div className="flex items-baseline justify-center font-mono font-bold text-coral drop-shadow-[0_2px_10px_rgba(231,117,121,0.25)]">
+          <div className="flex items-baseline justify-center font-mono font-bold text-[#FBBF24] drop-shadow-[0_2px_12px_rgba(251,191,36,0.3)]">
+            <span className={`${isMini ? 'text-xl' : 'text-2xl'} mr-1.5 select-none`}>💰</span>
             {!isEuropean && <span className={`${isMini ? 'text-xl' : 'text-2xl'} mr-0.5`}>{sym}</span>}
             <span className={`${isMini ? 'text-3xl' : 'text-4xl'} tracking-tight select-all font-extrabold`}>
               {todayEarnedFormatted}
@@ -184,19 +187,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {isMini && (
             <button
               onClick={onCycleEquivalence}
-              className="mt-2 px-2.5 py-1 rounded-full bg-[#081518] border border-[#14262A] hover:border-coral/40 text-[11px] text-white flex items-center gap-1.5 transition-all shadow-sm"
+              className="mt-2 px-2.5 py-1 rounded-full bg-[#081518] border border-[#14262A] hover:border-[#FBBF24]/40 text-[11px] text-white flex items-center gap-1.5 transition-all shadow-sm"
               title={`单价: ${sym}${equivalence.formattedPrice}`}
             >
               <span>{equivalence.item.icon}</span>
               {equivalence.isGoal ? (
                 <>
                   <span className="font-mono text-mint font-bold">{equivalence.progressPercent.toFixed(1)}%</span>
-                  <span className="text-grayteal text-[10px] truncate max-w-[120px]">{equivalence.item.name}</span>
+                  <span className="text-grayteal text-[10px] truncate max-w-[120px]">{getEquivalenceName(equivalence.item, lang)}</span>
                 </>
               ) : (
                 <>
                   <span className="font-mono text-mint font-bold">{equivalence.count.toFixed(1)}</span>
-                  <span className="text-grayteal text-[10px] truncate max-w-[120px]">{equivalence.item.unit}{equivalence.item.name}</span>
+                  <span className="text-grayteal text-[10px] truncate max-w-[120px]">{getEquivalenceUnit(equivalence.item, lang)}{getEquivalenceName(equivalence.item, lang)}</span>
                 </>
               )}
             </button>
@@ -206,7 +209,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Below sections are only shown in Full Mode */}
         {!isMini && (
           <>
-            {/* 3. 4-Column Stats Row (每秒进账, 时薪, 日薪, 本月已赚) */}
+            {/* 3. 4-Column Stats Row (每秒进账, 时薪, 日薪, 年薪) */}
             <div className="grid grid-cols-4 gap-1 py-1.5 text-left border-y border-white/[0.04]">
               <div>
                 <div className="text-[10px] text-grayteal truncate">{l10n.perSecond}</div>
@@ -236,11 +239,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               <div>
-                <div className="text-[10px] text-mint/90 truncate">{l10n.monthEarned}</div>
-                <div className="text-xs font-bold font-mono text-mint truncate">
+                <div className="text-[10px] text-grayteal truncate">{l10n.annualSalary}</div>
+                <div className="text-xs font-bold font-mono text-white truncate">
                   {isEuropean
-                    ? `${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)} ${sym}`
-                    : `${sym}${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)}`}
+                    ? `${formatCurrencyValue(calculator.annualEarnings, settings.displayCurrency, 0)} ${sym}`
+                    : `${sym}${formatCurrencyValue(calculator.annualEarnings, settings.displayCurrency, 0)}`}
                 </div>
               </div>
             </div>
@@ -406,12 +409,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {equivalence.isGoal ? (
                   <div className="flex items-center gap-1.5 flex-1 min-w-0">
                     <span className="font-mono text-mint font-bold">{equivalence.progressPercent.toFixed(1)}%</span>
-                    <span className="text-grayteal text-[10px] truncate">{equivalence.item.name}</span>
+                    <span className="text-grayteal text-[10px] truncate">{getEquivalenceName(equivalence.item, lang)}</span>
                   </div>
                 ) : (
                   <>
                     <span className="font-mono text-mint font-bold">{equivalence.count.toFixed(1)}</span>
-                    <span className="text-grayteal text-[10px] truncate">{equivalence.item.unit}{equivalence.item.name}</span>
+                    <span className="text-grayteal text-[10px] truncate">{getEquivalenceUnit(equivalence.item, lang)}{getEquivalenceName(equivalence.item, lang)}</span>
                   </>
                 )}
               </div>
