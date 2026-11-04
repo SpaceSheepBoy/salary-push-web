@@ -265,17 +265,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const sym = getCurrencySymbol(settings.salaryCurrency);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-md my-6 rounded-2xl bg-[#0E2024] border border-[#1F3238] shadow-2xl p-4 sm:p-5 text-white max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md px-3 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)] sm:p-4 overflow-y-auto overscroll-contain">
+      <div className="relative w-full max-w-md my-auto rounded-2xl bg-[#0E2024] border border-[#1F3238] shadow-2xl p-4 sm:p-5 text-white max-h-[calc(100dvh-2.5rem)] overflow-y-auto overscroll-contain">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#1F3238]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#1F3238] sticky top-0 bg-[#0E2024]/95 backdrop-blur-sm z-10 -mt-1 pt-1">
           <div>
-            <h3 className="text-base font-bold text-white">⚙️ 设置 Settings</h3>
+            <h3 className="text-base font-bold text-white flex items-center gap-1.5">
+              <span>⚙️</span>
+              <span>设置 Settings</span>
+            </h3>
             <p className="text-xs text-grayteal">国家国情、社保公积金、假期与薪酬精准核算</p>
           </div>
           <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-grayteal hover:text-white hover:bg-white/5 transition-colors"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="h-9 w-9 flex items-center justify-center rounded-xl text-grayteal hover:text-white bg-white/5 hover:bg-white/10 active:scale-95 transition-all cursor-pointer touch-manipulation"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>

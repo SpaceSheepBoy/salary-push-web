@@ -98,25 +98,33 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <span className="text-[10px] opacity-60">SalaryPush</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Mini Mode Toggle - Enlarge to 36px touch target */}
+        <div className="flex items-center gap-2 relative z-20">
+          {/* Mini Mode Toggle */}
           <button
             type="button"
-            onClick={onToggleMini}
-            className="h-9 w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-coral/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all touch-manipulation select-none active:scale-95 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleMini();
+            }}
+            className="h-10 w-10 sm:h-9 sm:w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-coral/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all cursor-pointer touch-manipulation select-none active:scale-90 shadow-sm"
             title={isMini ? 'Expand' : 'Mini Mode'}
+            aria-label="Toggle Mini Mode"
           >
             {isMini ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
 
-          {/* Settings Button - Enlarge to 36px touch target */}
+          {/* Settings Button - Expanded 40px touch zone */}
           <button
             type="button"
-            onClick={onOpenSettings}
-            className="h-9 w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-coral/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all touch-manipulation select-none active:scale-95 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenSettings();
+            }}
+            className="h-10 w-10 sm:h-9 sm:w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-mint/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all cursor-pointer touch-manipulation select-none active:scale-90 shadow-sm relative group"
             title="Settings"
+            aria-label="Open Settings"
           >
-            <Settings className="w-4.5 h-4.5 text-white" />
+            <Settings className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-white group-hover:rotate-45 transition-transform" />
           </button>
         </div>
       </div>
@@ -132,9 +140,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-grayteal">{l10n.todayEarned}</span>
-            <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-mint">
-              {calculator.isCountingNet ? l10n.heroSubNet : l10n.heroSubBrut}
-            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenSettings();
+              }}
+              className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 border border-white/[0.08] text-mint flex items-center gap-1 cursor-pointer transition-all"
+              title="Click to change Tax Mode in Settings"
+            >
+              <span>{calculator.isCountingNet ? l10n.heroSubNet : l10n.heroSubBrut}</span>
+              <Settings className="w-2.5 h-2.5 opacity-60" />
+            </button>
           </div>
 
           <div
@@ -538,16 +555,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
 
           {/* Footer info & Usage Tips Toggle */}
-          <div className="flex items-center justify-between px-2 text-[10px] text-grayteal/70 font-mono">
+          <div className="flex items-center justify-between px-1 text-[11px] text-grayteal font-mono">
             <button
+              type="button"
               onClick={() => setShowTips(!showTips)}
-              className="flex items-center gap-1 hover:text-white transition-colors"
+              className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer py-1.5 px-1 active:scale-95"
             >
-              <HelpCircle className="w-3 h-3 text-coral" />
+              <HelpCircle className="w-3.5 h-3.5 text-coral" />
               <span>{l10n.cheatsheet}</span>
               {showTips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
-            <span>{now.toLocaleTimeString()}</span>
+
+            {/* Mobile Thumb-Friendly Settings Quick Access */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenSettings();
+              }}
+              className="flex items-center gap-1 text-mint hover:text-white px-2.5 py-1.5 rounded-lg bg-mint/10 border border-mint/25 hover:bg-mint/20 active:scale-95 transition-all cursor-pointer font-sans text-xs font-medium shadow-sm"
+              title="Open Settings"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>{lang === 'fr' ? 'Paramètres' : lang === 'zh' ? '设置' : lang === 'ja' ? '設定' : lang === 'de' ? 'Einstellungen' : 'Settings'}</span>
+            </button>
+
+            <span className="text-grayteal/60 text-[10px]">{now.toLocaleTimeString()}</span>
           </div>
 
           {/* Usage Tips Accordion */}

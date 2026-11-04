@@ -66,11 +66,16 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
       <div className="relative w-full max-w-sm rounded-2xl bg-[#0E2024] border border-[#1F3238] p-6 shadow-2xl text-center">
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-grayteal hover:text-white transition-colors"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-3.5 right-3.5 h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-grayteal hover:text-white transition-all cursor-pointer"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
