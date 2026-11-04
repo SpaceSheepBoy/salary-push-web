@@ -16,8 +16,61 @@ export class EarningsCalculator {
       : this.settings.salaryAmount;
   }
 
+  get deductionRate(): number {
+    if (this.settings.countrySystem === 'france') {
+      return this.settings.franceStatus === 'cadre' ? 0.25 : (this.settings.franceStatus === 'non_cadre' ? 0.22 : 0.15);
+    }
+    if (this.settings.countrySystem === 'china') {
+      const fund = (this.settings.chinaHousingFundEnabled ? this.settings.chinaHousingFundRate : 0) / 100;
+      const social = this.settings.chinaIncludeSocialSecurity ? 0.105 : 0;
+      return fund + social;
+    }
+    if (this.settings.countrySystem === 'germany') {
+      const pension = (this.settings.germanyPensionRate || 9.3) / 100;
+      const health = this.settings.germanyIncludeHealth ? 0.10 : 0;
+      return pension + health;
+    }
+    if (this.settings.countrySystem === 'uk') {
+      return ((this.settings.ukPensionRate || 5.0) + 8.0) / 100;
+    }
+    if (this.settings.countrySystem === 'japan') {
+      return (this.settings.japanSocialInsuranceRate || 15.0) / 100;
+    }
+    return (this.settings.customBenefitRate || 10.0) / 100;
+  }
+
+  get annualBrut(): number {
+    if (this.settings.salaryTaxMode === 'net') {
+      return this.annualSalary / Math.max(0.1, 1 - this.deductionRate);
+    }
+    return this.annualSalary;
+  }
+
+  get annualNet(): number {
+    if (this.settings.salaryTaxMode === 'net') {
+      return this.annualSalary;
+    }
+    return this.annualSalary * (1 - this.deductionRate);
+  }
+
+  get isCountingNet(): boolean {
+    return this.settings.tickerBasis !== 'brut';
+  }
+
+  get effectiveAnnualSalary(): number {
+    return this.isCountingNet ? this.annualNet : this.annualBrut;
+  }
+
   get annualEarnings(): number {
-    return this.annualSalary * this.exchangeRate;
+    return this.effectiveAnnualSalary * this.exchangeRate;
+  }
+
+  get annualBrutEarnings(): number {
+    return this.annualBrut * this.exchangeRate;
+  }
+
+  get annualNetEarnings(): number {
+    return this.annualNet * this.exchangeRate;
   }
 
   get monthlySalary(): number {
@@ -58,11 +111,11 @@ export class EarningsCalculator {
   }
 
   get dailyEarnings(): number {
-    return (this.annualSalary / this.workingDaysPerYear) * this.exchangeRate;
+    return (this.effectiveAnnualSalary / this.workingDaysPerYear) * this.exchangeRate;
   }
 
   get dailyEarningsSalaryCurrency(): number {
-    return this.workingDaysPerYear > 0 ? this.annualSalary / this.workingDaysPerYear : 0;
+    return this.workingDaysPerYear > 0 ? this.effectiveAnnualSalary / this.workingDaysPerYear : 0;
   }
 
   get hourlyEarnings(): number {
@@ -150,26 +203,29 @@ export class EarningsCalculator {
       const cotisationRate = this.settings.franceStatus === 'cadre' ? 0.25 : (this.settings.franceStatus === 'non_cadre' ? 0.22 : 0.15);
 
       if (this.settings.franceDisplayFocus === 'cotisations') {
-        const monthly = this.monthlySalary * cotisationRate;
+        const monthly = (this.annualBrut * cotisationRate) / 12;
         const perSec = (monthly * 12 / this.workingDaysPerYear / this.workHoursPerDay / 3600) * this.exchangeRate;
         const accumulated = secondsWorked * perSec;
         const monthlyDisp = monthly * this.exchangeRate;
         const statusLabel = this.settings.franceStatus === 'cadre' ? 'Cadre' : (this.settings.franceStatus === 'non_cadre' ? 'Non-cadre' : 'Fonctionnaire');
         const fmtMonthly = formatCurrencyValue(monthlyDisp, curr, 0);
-        const formula = `${fmtMonthly} ${sym}/mois · ${statusLabel} (-${Math.round(cotisationRate * 100)}%)`;
+        const isBrut = this.settings.salaryTaxMode !== 'net';
+        const formula = isBrut
+          ? (lang === 'fr' ? `-${fmtMonthly} ${sym}/mois (déduit du brut -${Math.round(cotisationRate * 100)}%)` : `从税前扣除 -${fmtMonthly} ${sym}/月 (-${Math.round(cotisationRate * 100)}%)`)
+          : (lang === 'fr' ? `~${fmtMonthly} ${sym}/mois (cotisations ${statusLabel})` : `预估统筹 ~${fmtMonthly} ${sym}/月 (${statusLabel})`);
 
         return {
-          title: lang === 'zh' ? '社保 Cotisations' : 'Cotisations',
+          title: lang === 'zh' ? '社保扣缴 Cotisations' : 'Cotisations salariales',
           todayAccumulated: accumulated,
           monthlyAmount: monthlyDisp,
           formulaText: formula,
         };
       } else if (this.settings.franceDisplayFocus === 'net') {
-        const netMonthly = this.monthlySalary * (1.0 - cotisationRate);
+        const netMonthly = (this.annualNet / 12);
         const perSec = (netMonthly * 12 / this.workingDaysPerYear / this.workHoursPerDay / 3600) * this.exchangeRate;
         const accumulated = secondsWorked * perSec;
         const netDisp = netMonthly * this.exchangeRate;
-        const brutDisp = this.monthlySalary * this.exchangeRate;
+        const brutDisp = (this.annualBrut / 12) * this.exchangeRate;
         const brutFmt = formatCurrencyValue(brutDisp, curr, 0);
         const netFmt = formatCurrencyValue(netDisp, curr, 0);
 
@@ -402,34 +458,63 @@ export class EarningsCalculator {
     name: string;
     price: number;
     formattedPrice: string;
+    saved: number;
+    formattedSaved: string;
+    remaining: number;
+    formattedRemaining: string;
+    totalAccumulated: number;
+    formattedTotal: string;
     rawPrice: number;
+    rawSaved: number;
     rawCurrency: string;
     todayEarned: number;
     progressPercent: number;
+    savedPercent: number;
+    todayPercent: number;
   } {
     const name = this.settings.customWishlistName || '我的私人心愿';
     const rawPrice = Math.max(1, this.settings.customWishlistPrice || 2000);
+    const rawSaved = Math.max(0, this.settings.customWishlistSaved || 0);
     const wishlistCurr = (this.settings.customWishlistCurrency || this.settings.displayCurrency).toUpperCase();
     const displayCurr = this.settings.displayCurrency.toUpperCase();
 
-    // Convert rawPrice to displayCurrency if different
+    // Convert rawPrice and rawSaved to displayCurrency if different
     let convertedPrice = rawPrice;
+    let convertedSaved = rawSaved;
     if (wishlistCurr !== displayCurr) {
       const convRate = getExchangeRate(wishlistCurr, displayCurr);
       convertedPrice = rawPrice * convRate;
+      convertedSaved = rawSaved * convRate;
     }
 
-    const progressPercent = Math.min(100, (earnedToday / Math.max(0.01, convertedPrice)) * 100);
+    const totalAccumulated = convertedSaved + earnedToday;
+    const progressPercent = Math.min(100, Math.max(0, (totalAccumulated / Math.max(0.01, convertedPrice)) * 100));
+    const savedPercent = Math.min(100, Math.max(0, (convertedSaved / Math.max(0.01, convertedPrice)) * 100));
+    const todayPercent = Math.min(Math.max(0, 100 - savedPercent), Math.max(0, (earnedToday / Math.max(0.01, convertedPrice)) * 100));
+    const remainingAmount = Math.max(0, convertedPrice - totalAccumulated);
+
     const formattedPrice = formatCurrencyValue(convertedPrice, this.settings.displayCurrency, 2);
+    const formattedSaved = formatCurrencyValue(convertedSaved, this.settings.displayCurrency, 2);
+    const formattedRemaining = formatCurrencyValue(remainingAmount, this.settings.displayCurrency, 2);
+    const formattedTotal = formatCurrencyValue(totalAccumulated, this.settings.displayCurrency, 2);
 
     return {
       name,
       price: convertedPrice,
       formattedPrice,
+      saved: convertedSaved,
+      formattedSaved,
+      remaining: remainingAmount,
+      formattedRemaining,
+      totalAccumulated,
+      formattedTotal,
       rawPrice,
+      rawSaved,
       rawCurrency: wishlistCurr,
       todayEarned: earnedToday,
       progressPercent,
+      savedPercent,
+      todayPercent,
     };
   }
 

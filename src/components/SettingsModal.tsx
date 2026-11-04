@@ -10,6 +10,7 @@ import {
   SUPPORTED_CURRENCIES,
   getEquivalenceName,
   getEquivalenceUnit,
+  L10N,
 } from '../utils/constants';
 import { EarningsCalculator } from '../utils/calculator';
 
@@ -28,6 +29,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const l10n = L10N[settings.appLanguage];
+
   const handleChange = <K extends keyof SalarySettings>(key: K, value: SalarySettings[K]) => {
     onUpdate({ ...settings, [key]: value });
   };
@@ -35,6 +38,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   // Local string state to prevent mobile "03500" leading-zero and backspace bugs
   const [salaryInput, setSalaryInput] = useState<string>(() => (settings.salaryAmount ? settings.salaryAmount.toString() : ''));
   const [wishlistPriceInput, setWishlistPriceInput] = useState<string>(() => (settings.customWishlistPrice ? settings.customWishlistPrice.toString() : ''));
+  const [wishlistSavedInput, setWishlistSavedInput] = useState<string>(() => (settings.customWishlistSaved ? settings.customWishlistSaved.toString() : '0'));
 
   // Sync state if settings update externally (e.g. clicking autofill defaults or switching country)
   useEffect(() => {
@@ -48,6 +52,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setWishlistPriceInput(settings.customWishlistPrice ? settings.customWishlistPrice.toString() : '');
     }
   }, [settings.customWishlistPrice]);
+
+  useEffect(() => {
+    if (Number(wishlistSavedInput) !== (settings.customWishlistSaved || 0)) {
+      setWishlistSavedInput((settings.customWishlistSaved || 0).toString());
+    }
+  }, [settings.customWishlistSaved]);
 
   const handleSalaryInputChange = (raw: string) => {
     // Keep only numbers and single dot
@@ -190,6 +200,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const next = Math.max(0, Math.round((settings.customWishlistPrice + delta) * 100) / 100);
     handleChange('customWishlistPrice', next);
     setWishlistPriceInput(next.toString());
+  };
+
+  const handleWishlistSavedChange = (raw: string) => {
+    let cleaned = raw.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('');
+    }
+    if (/^0[0-9]+/.test(cleaned)) {
+      cleaned = cleaned.replace(/^0+/, '');
+    }
+    setWishlistSavedInput(cleaned);
+    if (cleaned === '' || cleaned === '.') {
+      handleChange('customWishlistSaved', 0);
+    } else {
+      const num = parseFloat(cleaned);
+      if (!isNaN(num)) {
+        handleChange('customWishlistSaved', num);
+      }
+    }
+  };
+
+  const handleWishlistSavedBlur = () => {
+    if (wishlistSavedInput === '' || Number(wishlistSavedInput) === 0) {
+      setWishlistSavedInput('0');
+      handleChange('customWishlistSaved', 0);
+    } else {
+      const cleanNum = parseFloat(wishlistSavedInput) || 0;
+      setWishlistSavedInput(cleanNum.toString());
+      handleChange('customWishlistSaved', cleanNum);
+    }
+  };
+
+  const adjustWishlistSaved = (delta: number) => {
+    const next = Math.max(0, Math.round(((settings.customWishlistSaved || 0) + delta) * 100) / 100);
+    handleChange('customWishlistSaved', next);
+    setWishlistSavedInput(next.toString());
   };
 
   const handleCountryChange = (country: CountrySystem) => {
@@ -574,6 +621,82 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </button>
             </div>
 
+            {/* Tax Base: Brut (Gross) vs Net (Take-home) */}
+            <div className="pt-0.5">
+              <label className="text-[11px] text-grayteal block mb-1">
+                计薪基准 (Tax Base / Brut vs Net)
+              </label>
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#14262A] rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => handleChange('salaryTaxMode', 'brut')}
+                  className={`py-1 text-xs font-medium rounded-md transition-all ${
+                    settings.salaryTaxMode !== 'net'
+                      ? 'bg-cyanaccent text-black font-bold shadow'
+                      : 'text-grayteal hover:text-white'
+                  }`}
+                >
+                  {l10n.taxModeBrut}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange('salaryTaxMode', 'net')}
+                  className={`py-1 text-xs font-medium rounded-md transition-all ${
+                    settings.salaryTaxMode === 'net'
+                      ? 'bg-mint text-black font-bold shadow'
+                      : 'text-grayteal hover:text-white'
+                  }`}
+                >
+                  {l10n.taxModeNet}
+                </button>
+              </div>
+
+              {/* Tax & Cotisations Explanation Card */}
+              <div className="mt-1.5 p-2 rounded-lg bg-[#0E2024] border border-[#1E363D] space-y-1 text-[11px]">
+                <div className="text-grayteal leading-relaxed">
+                  {settings.salaryTaxMode !== 'net' ? (
+                    settings.appLanguage === 'fr'
+                      ? '💡 Vous saisissez votre salaire brut contractuel. Les cotisations sociales salariales (~25% cadre / ~22% non-cadre) sont déduites automatiquement pour calculer le net réel.'
+                      : '💡 您输入的是税前毛薪 (Brut)。社保/公积金为法定扣减项，扣除后即为实发到手净薪 (Net)。'
+                  ) : (
+                    settings.appLanguage === 'fr'
+                      ? '💡 Vous saisissez directement votre salaire net perçu chaque mois en banque. Le chrono compte 100% en argent disponible.'
+                      : '💡 您输入的是每月实发到手净薪 (Net)，今日已赚将 100% 对应您可自由支配的净现金。'
+                  )}
+                </div>
+
+                {settings.salaryTaxMode !== 'net' && (
+                  <div className="flex items-center justify-between pt-1 border-t border-white/[0.06]">
+                    <span className="text-grayteal text-[10px]">秒表按哪种进账?</span>
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleChange('tickerBasis', 'net')}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                          settings.tickerBasis !== 'brut'
+                            ? 'bg-mint text-black font-bold'
+                            : 'bg-[#14262A] text-grayteal'
+                        }`}
+                      >
+                        {l10n.tickerBasisNet} (推荐)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChange('tickerBasis', 'brut')}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                          settings.tickerBasis === 'brut'
+                            ? 'bg-cyanaccent text-black font-bold'
+                            : 'bg-[#14262A] text-grayteal'
+                        }`}
+                      >
+                        {l10n.tickerBasisBrut}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-[11px] text-grayteal">
@@ -753,6 +876,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       ))}
                     </select>
                   </div>
+                </div>
+              </div>
+
+              {/* Already-Saved Input (已存/已攒金额) */}
+              <div className="pt-1.5 border-t border-white/[0.04]">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] text-grayteal">
+                    💰 {l10n.wishlistSavedLabel} (已攒本金/储蓄)
+                  </label>
+                  <span className="text-[9px] text-mint">计入合并达成进度条</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => adjustWishlistSaved(-100)}
+                    className="h-8 w-9 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-coral border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
+                  >
+                    -100
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*"
+                    value={wishlistSavedInput}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => handleWishlistSavedChange(e.target.value)}
+                    onBlur={handleWishlistSavedBlur}
+                    placeholder="已存金额 (默认 0)"
+                    className="flex-1 bg-[#0E2024] border border-[#1F3238] focus:border-mint text-white text-base sm:text-xs rounded px-2 py-1.5 font-mono focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => adjustWishlistSaved(100)}
+                    className="h-8 w-9 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-mint border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
+                  >
+                    +100
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => adjustWishlistSaved(500)}
+                    className="h-8 w-10 flex items-center justify-center rounded bg-[#0E2024] hover:bg-[#1C363D] active:bg-mint border border-[#1F3238] text-white text-[11px] font-mono touch-manipulation active:scale-95"
+                  >
+                    +500
+                  </button>
                 </div>
               </div>
               {(settings.customWishlistCurrency || settings.displayCurrency) !== settings.displayCurrency && (

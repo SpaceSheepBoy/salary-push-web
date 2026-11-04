@@ -1,6 +1,8 @@
 export type CountrySystem = 'china' | 'france' | 'germany' | 'uk' | 'japan' | 'us' | 'custom';
 export type AppLanguage = 'zh' | 'fr' | 'en' | 'de' | 'ja';
 export type SalaryInputMode = 'monthly' | 'annual';
+export type SalaryTaxMode = 'brut' | 'net'; // 'brut' = Gross / 税前, 'net' = Net / 税后到手
+export type TickerCalculationBasis = 'net' | 'brut'; // Ticker tracks Net or Brut
 export type FranceStatus = 'cadre' | 'non_cadre' | 'fonctionnaire';
 export type FranceDisplayFocus = 'cotisations' | 'net' | 'avantages';
 
@@ -29,6 +31,8 @@ export interface SalarySettings {
 
   // Salary
   salaryInputMode: SalaryInputMode;
+  salaryTaxMode: SalaryTaxMode;
+  tickerBasis: TickerCalculationBasis;
   salaryAmount: number;
   salaryCurrency: string;
   displayCurrency: string;
@@ -84,6 +88,7 @@ export interface SalarySettings {
   activeEquivalenceId: string;
   customWishlistName: string;
   customWishlistPrice: number;
+  customWishlistSaved?: number; // 已经存/攒了多少钱
   customWishlistCurrency?: string;
 }
 

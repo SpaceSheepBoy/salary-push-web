@@ -94,36 +94,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-1 text-grayteal">
         <div className="flex items-center gap-1.5">
-          <span className="font-medium text-xs text-white">{l10n.appTitle}</span>
+          <span className="font-semibold text-xs text-white tracking-wide">{l10n.appTitle}</span>
           <span className="text-[10px] opacity-60">SalaryPush</span>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mini Mode Toggle */}
+          {/* Mini Mode Toggle - Enlarge to 36px touch target */}
           <button
+            type="button"
             onClick={onToggleMini}
-            className="hover:text-white transition-colors"
+            className="h-9 w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-coral/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all touch-manipulation select-none active:scale-95 shadow-sm"
             title={isMini ? 'Expand' : 'Mini Mode'}
           >
-            {isMini ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
+            {isMini ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
 
-          {/* Stealth Boss Key Toggle */}
+          {/* Settings Button - Enlarge to 36px touch target */}
           <button
-            onClick={onToggleStealth}
-            className="hover:text-white transition-colors"
-            title={l10n.stealthMode}
-          >
-            <Eye className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Settings */}
-          <button
+            type="button"
             onClick={onOpenSettings}
-            className="hover:text-white transition-colors"
+            className="h-9 w-9 flex items-center justify-center rounded-xl bg-[#122429] hover:bg-[#1C363D] active:bg-coral/30 border border-[#1F3238] text-gray-300 hover:text-white transition-all touch-manipulation select-none active:scale-95 shadow-sm"
             title="Settings"
           >
-            <Settings className="w-3.5 h-3.5" />
+            <Settings className="w-4.5 h-4.5 text-white" />
           </button>
         </div>
       </div>
@@ -135,9 +128,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           isMini ? 'p-3 gap-1.5' : 'p-3.5 gap-2.5'
         } flex flex-col shadow-2xl relative cursor-default transition-all duration-300`}
       >
-        {/* 1. Header: 今日已赚 + ● 在岗 */}
+        {/* 1. Header: 今日已赚 + [Net / Brut 状态徽章] + ● 在岗 */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-grayteal">{l10n.todayEarned}</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-grayteal">{l10n.todayEarned}</span>
+            <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-mint">
+              {calculator.isCountingNet ? l10n.heroSubNet : l10n.heroSubBrut}
+            </span>
+          </div>
 
           <div
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
@@ -353,43 +351,65 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Extra Interactive Cards (Full Mode Only) */}
       {!isMini && (
         <>
-          {/* Dedicated Private Wishlist Milestone Goal */}
-          <div className="p-2.5 rounded-xl bg-cardbg/80 border border-cardborder text-left hover:border-mint/50 transition-all group">
-            <div className="text-[10px] text-grayteal flex items-center justify-between w-full mb-1">
-              <span className="flex items-center gap-1 font-semibold text-white">
+          {/* Dedicated Private Wishlist Milestone Goal with Already-Saved Progress */}
+          <div className="p-3 rounded-xl bg-cardbg/80 border border-cardborder text-left hover:border-mint/50 transition-all group space-y-1.5">
+            <div className="text-[10px] text-grayteal flex items-center justify-between w-full">
+              <span className="flex items-center gap-1.5 font-semibold text-white">
                 <span className="text-sm">🎯</span>
                 <span>{l10n.wishlistGoal || '私人心愿目标'}</span>
               </span>
               <button
+                type="button"
                 onClick={onOpenSettings}
-                className="text-[10px] text-coral hover:underline flex items-center gap-1 transition-colors"
+                className="text-[11px] text-coral hover:underline flex items-center gap-1 transition-colors"
                 title="Settings"
               >
                 <span className="font-medium">{wishlist.name}</span>
                 <span className="text-grayteal/60 group-hover:text-coral transition-colors">✎</span>
               </button>
             </div>
-            <div className="flex items-baseline justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold font-mono text-mint">{wishlist.progressPercent.toFixed(1)}%</span>
-                <span className="text-[10px] text-grayteal">
-                  {l10n.todayContribution} {isEuropean ? `${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)} ${sym}` : `${sym}${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}`}
-                </span>
-              </div>
-              <div className="text-[10px] font-mono text-grayteal">
-                {l10n.targetLabel} {isEuropean ? `${wishlist.formattedPrice} ${sym}` : `${sym}${wishlist.formattedPrice}`}
-                {wishlist.rawCurrency !== settings.displayCurrency && (
-                  <span className="text-[9px] text-grayteal/70 ml-1">
-                    ({wishlist.rawPrice} {getCurrencySymbol(wishlist.rawCurrency)})
+
+            {/* Visual Multi-Segment Progress Bar */}
+            <div className="w-full h-2 bg-[#0E1F24] rounded-full overflow-hidden flex relative border border-[#182C31]">
+              {/* Segment 1: Already Saved (Mint) */}
+              <div
+                className="h-full bg-gradient-to-r from-teal-500 to-mint transition-all duration-300"
+                style={{ width: `${wishlist.savedPercent}%` }}
+                title={`已存: ${sym}${wishlist.formattedSaved}`}
+              />
+              {/* Segment 2: Today's Earned (Gold) */}
+              <div
+                className="h-full bg-[#FBBF24] transition-all duration-300"
+                style={{ width: `${wishlist.todayPercent}%` }}
+                title={`今日进账: ${sym}${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}`}
+              />
+            </div>
+
+            {/* Clear Multi-Row Data Breakdown */}
+            <div className="flex items-center justify-between text-[10.5px] font-mono pt-0.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-mint font-mono">{wishlist.progressPercent.toFixed(1)}%</span>
+                {wishlist.saved > 0 && (
+                  <span className="text-grayteal">
+                    {l10n.wishlistSavedLabel}: <span className="text-white font-medium">{isEuropean ? `${wishlist.formattedSaved} ${sym}` : `${sym}${wishlist.formattedSaved}`}</span>
                   </span>
                 )}
+                <span className="text-grayteal">
+                  +{l10n.todayContribution}: <span className="text-[#FBBF24] font-medium">{isEuropean ? `${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)} ${sym}` : `${sym}${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}`}</span>
+                </span>
               </div>
-            </div>
-            <div className="w-full h-1.5 bg-[#14262A] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-mint to-cyanaccent rounded-full transition-all duration-300"
-                style={{ width: `${Math.max(1.5, Math.min(100, wishlist.progressPercent))}%` }}
-              />
+
+              <div className="text-right text-grayteal whitespace-nowrap">
+                <span>{l10n.targetLabel}: </span>
+                <span className="text-white font-bold">{isEuropean ? `${wishlist.formattedPrice} ${sym}` : `${sym}${wishlist.formattedPrice}`}</span>
+                {wishlist.remaining > 0 ? (
+                  <span className="text-coral ml-1 text-[10px]">
+                    ({l10n.wishlistRemainingLabel} {isEuropean ? `${wishlist.formattedRemaining} ${sym}` : `${sym}${wishlist.formattedRemaining}`})
+                  </span>
+                ) : (
+                  <span className="text-mint ml-1 text-[10px]">🎉 已达成</span>
+                )}
+              </div>
             </div>
           </div>
 
