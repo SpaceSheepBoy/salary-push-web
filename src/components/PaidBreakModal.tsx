@@ -80,10 +80,10 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
         </div>
 
         <h3 className="text-lg font-bold text-white mb-1">
-          {lang === 'zh' ? '☕️ 带薪摸鱼 / 如厕计时' : (lang === 'fr' ? '☕️ Pause Café Payée' : '☕️ Paid Break Tracker')}
+          {lang === 'zh' ? '☕️ 工间休息 / 能量补给' : (lang === 'fr' ? '☕️ Pause Café Payée' : '☕️ Paid Break Tracker')}
         </h3>
         <p className="text-xs text-grayteal mb-4">
-          {lang === 'zh' ? '每一秒都是公司为你的休息买单' : (lang === 'fr' ? 'Chaque seconde de pause est rémunérée' : 'Every second of your break is paid')}
+          {lang === 'zh' ? '劳逸结合，工间休息时间同样计算在工时内' : (lang === 'fr' ? 'Chaque seconde de pause est rémunérée' : 'Every second of your break is paid')}
         </p>
 
         {!finishedResult ? (
@@ -93,7 +93,7 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
             </div>
 
             <div className="text-xs text-grayteal uppercase tracking-wider mb-1">
-              {lang === 'zh' ? '本次摸鱼已赚' : (lang === 'fr' ? 'Gains de la pause' : 'Earned during break')}
+              {lang === 'zh' ? '本次休息已进账' : (lang === 'fr' ? 'Gains de la pause' : 'Earned during break')}
             </div>
 
             <div className="text-3xl font-bold font-mono text-coral mb-6">
@@ -107,7 +107,7 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
                   className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-coral hover:bg-coral/90 text-white font-medium text-sm transition-all"
                 >
                   <Square className="w-4 h-4 fill-white" />
-                  {lang === 'zh' ? '摸鱼结束，结算战报' : (lang === 'fr' ? 'Terminer la pause' : 'End Break')}
+                  {lang === 'zh' ? '休息结束，结算收益' : (lang === 'fr' ? 'Terminer la pause' : 'End Break')}
                 </button>
               ) : (
                 <button
@@ -115,7 +115,7 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
                   className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-mint hover:bg-mint/90 text-[#091417] font-semibold text-sm transition-all"
                 >
                   <Play className="w-4 h-4 fill-[#091417]" />
-                  {lang === 'zh' ? '继续摸鱼' : (lang === 'fr' ? 'Reprendre' : 'Resume')}
+                  {lang === 'zh' ? '继续休息' : (lang === 'fr' ? 'Reprendre' : 'Resume')}
                 </button>
               )}
             </div>
@@ -125,7 +125,7 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
             <div className="p-4 rounded-xl bg-[#091417] border border-[#1F3238] mb-4">
               <div className="text-2xl mb-1">🎉</div>
               <div className="text-sm font-semibold text-white mb-1">
-                {lang === 'zh' ? '带薪摸鱼大成功！' : (lang === 'fr' ? 'Pause réussie !' : 'Break Completed!')}
+                {lang === 'zh' ? '能量补给完成！' : (lang === 'fr' ? 'Pause réussie !' : 'Break Completed!')}
               </div>
               <p className="text-xs text-grayteal mb-3">
                 {lang === 'zh' ? `本次共休息 ${finishedResult.time}` : `Duration: ${finishedResult.time}`}

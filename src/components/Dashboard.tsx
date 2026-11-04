@@ -88,7 +88,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="flex items-center justify-between px-1 text-grayteal">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-medium text-grayteal">{l10n.appTitle}</span>
-          <span className="text-[10px] opacity-60">SalaryPush · 带薪摸鱼</span>
+          <span className="text-[10px] opacity-60">SalaryPush · 上班加油</span>
         </div>
 
         <div className="flex items-center gap-1">

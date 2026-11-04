@@ -1,4 +1,4 @@
-# ⚡️ 上班加油器 · 带薪摸鱼计算器 (SalaryPush)
+# ⚡️ 上班加油器 (SalaryPush)
 
 <div align="center">
 
@@ -10,8 +10,8 @@
 [![Live Web App](https://img.shields.io/badge/Online%20Web%20App-Visit%20Now-ff69b4?style=for-the-badge)](https://salary-push-web.vercel.app)
 [![macOS App](https://img.shields.io/badge/macOS%20Client-Download%20DMG-black?logo=apple&style=for-the-badge)](https://github.com/SpaceSheepBoy/SalaryPush/releases/latest)
 
-**每一秒呼吸都在变现，让打工人的每一点付出和带薪摸鱼都清晰可见**  
-*Turn work into visible progress. Real-time salary ticker & paid slacking tracker for modern professionals.*
+**每一秒呼吸都在变现，让打工人的每一点努力和付出都清晰可见**  
+*Turn work into visible progress. Real-time salary ticker & workplace motivation for modern professionals.*
 
 [🌐 立即体验 Web 网页版 / Try Live Demo](https://salary-push-web.vercel.app) • [📥 下载 macOS 原生客户端 / Download Mac App](https://github.com/SpaceSheepBoy/SalaryPush/releases/latest) • [✨ 功能特性 / Features](#-功能特性--features)
 
@@ -36,7 +36,7 @@
 ### 🇨🇳 中文说明
 
 - ⏱ **30fps 实时进账跳动**：工作时间内以高频流畅动画显示当前分秒赚到的每一分钱，严格精确到小数点后两位。
-- ☕️ **带薪摸鱼 / 如厕计时器**：内置摸鱼战报系统，实时统计摸鱼、喝咖啡或洗手间期间为老板赚取的薪水，结束后触发礼花庆祝动画并生成战报。
+- ☕️ **工间休息 / 能量补给计时器**：内置休息收益统计系统，实时计算工间小憩、喝咖啡期间的薪酬进账，结束后触发礼花庆祝并生成战报。
 - 🌏 **深入适配 Tier 1 全球主流国情**：
   - 🇨🇳 **中国**：住房公积金（5%~12% 个人+单位 1:1 双倍进账）实时折算，真实中位数月薪预设（¥8,000）。
   - 🇫🇷 **法国**：Cadre / Non-cadre 社保分摊（~25%/22%）、RTT 调休假、Tickets Resto 饭补（€6/天）与 Navigo 50% 交通补贴折算，中位数预设（2 500 €）。
@@ -63,7 +63,7 @@
 ### 🇬🇧 English Description
 
 - ⏱ **Real-Time 30fps Earnings Counter**: Watch your earnings tick up every fraction of a second during working hours, precisely formatted to 2 decimal places.
-- ☕️ **Paid Slacking & Coffee Break Tracker**: Track every second of your paid breaks (coffee, bathroom, walking) and see exactly how much your company paid you to relax, complete with confetti celebrations.
+- ☕️ **Break & Energy Recharge Tracker**: Track your paid coffee and recharge breaks with real-time earnings, complete with celebration animations.
 - 🌏 **Deep Tier-1 Social System Integration**:
   - 🇨🇳 **China**: Housing Provident Fund (5%~12% with 1:1 employer match), realistic median wage preset (¥8,000/mo).
   - 🇫🇷 **France**: Cadre / Non-cadre cotisations (~25%/22%), RTT days, Tickets-Restaurant (€6/day) & Navigo transit 50%, median preset (€2,500/mo).
