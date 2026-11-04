@@ -411,6 +411,55 @@ export class EarningsCalculator {
     };
   }
 
+  // Month-to-Date Live Earnings
+  monthToDateEarnings(now: Date = new Date()): {
+    pastDaysEarned: number;
+    todayEarned: number;
+    totalEarned: number;
+    totalExpected: number;
+    progressPercent: number;
+    pastWorkDays: number;
+    totalWorkDaysInMonth: number;
+  } {
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed
+    const currentDay = now.getDate();
+
+    // Total days in current month
+    const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let pastWorkDays = 0;
+    let totalWorkDaysInMonth = 0;
+
+    for (let d = 1; d <= totalDaysInMonth; d++) {
+      const dayDate = new Date(year, month, d);
+      const weekday = dayDate.getDay() + 1; // 1=Sun, 2=Mon...
+      if (this.settings.workDays.includes(weekday)) {
+        totalWorkDaysInMonth++;
+        if (d < currentDay) {
+          pastWorkDays++;
+        }
+      }
+    }
+
+    const pastDaysEarned = pastWorkDays * this.dailyEarnings;
+    const isTodayWork = this.settings.workDays.includes(now.getDay() + 1);
+    const todayEarned = isTodayWork ? this.todayEarnings(now) : 0;
+    const totalEarned = pastDaysEarned + todayEarned;
+    const totalExpected = Math.max(1, totalWorkDaysInMonth * this.dailyEarnings);
+    const progressPercent = Math.min(100, Math.max(0, (totalEarned / totalExpected) * 100));
+
+    return {
+      pastDaysEarned,
+      todayEarned,
+      totalEarned,
+      totalExpected,
+      progressPercent,
+      pastWorkDays,
+      totalWorkDaysInMonth,
+    };
+  }
+
   // Enhanced Reward / Equivalence System
   salaryEquivalence(earnedToday: number): {
     item: typeof EQUIVALENCE_CATALOG[0];

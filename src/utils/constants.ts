@@ -217,6 +217,8 @@ export const L10N = {
     perSecond: '每秒进账',
     hourlyRate: '时薪',
     dailyRate: '日薪',
+    monthEarned: '本月已赚',
+    monthProgress: '完成',
     nextRest: '下一个休息',
     weekend: '周末',
     holiday: '假期',
@@ -228,9 +230,18 @@ export const L10N = {
     paidBreakTitle: '工间休息 / 能量补给计时器',
     stealthMode: '老板键 (隐身模式)',
     equivalence: '实物激励',
+    earnedGoods: '今日已赚实物',
+    savingGoal: '攒钱目标',
     paydayCountdown: '距发薪日',
     wishlistGoal: '私人心愿目标',
     paydayEndOfMonth: '每月月底',
+    daysUnit: '天',
+    hoursUnit: '时',
+    startBreakTimer: '+开始计时',
+    cheatsheet: '使用秘籍',
+    todayContribution: '今日贡献',
+    targetLabel: '目标',
+    unitPriceLabel: '单价',
   },
   fr: {
     appTitle: 'Booster Salaire',
@@ -240,6 +251,8 @@ export const L10N = {
     perSecond: 'Par seconde',
     hourlyRate: 'Taux horaire',
     dailyRate: 'Par jour',
+    monthEarned: 'Ce mois',
+    monthProgress: 'Progression',
     nextRest: 'Prochain repos',
     weekend: 'Week-end',
     holiday: 'Férié',
@@ -251,9 +264,18 @@ export const L10N = {
     paidBreakTitle: 'Chrono Pause Café / Toilettes Payée',
     stealthMode: 'Mode Discret (Boss Key)',
     equivalence: 'Récompense',
+    earnedGoods: 'Équivalent du jour',
+    savingGoal: 'Objectif Épargne',
     paydayCountdown: 'Avant la paie',
     wishlistGoal: 'Objectif Personnel',
     paydayEndOfMonth: 'Fin de mois',
+    daysUnit: 'j',
+    hoursUnit: 'h',
+    startBreakTimer: '+Démarrer',
+    cheatsheet: 'Astuces & Raccourcis',
+    todayContribution: 'Aujourd\'hui',
+    targetLabel: 'Cible',
+    unitPriceLabel: 'Prix',
   },
   en: {
     appTitle: 'Work Fuel',
@@ -263,6 +285,8 @@ export const L10N = {
     perSecond: 'Per second',
     hourlyRate: 'Hourly',
     dailyRate: 'Daily',
+    monthEarned: 'This Month',
+    monthProgress: 'Progress',
     nextRest: 'Next rest',
     weekend: 'Weekend',
     holiday: 'Holiday',
@@ -274,9 +298,18 @@ export const L10N = {
     paidBreakTitle: 'Paid Coffee / Bathroom Break Timer',
     stealthMode: 'Stealth Boss Key',
     equivalence: 'Rewards',
+    earnedGoods: "Today's Goods",
+    savingGoal: 'Savings Goal',
     paydayCountdown: 'Until Payday',
     wishlistGoal: 'Private Wishlist Goal',
     paydayEndOfMonth: 'End of Month',
+    daysUnit: 'd',
+    hoursUnit: 'h',
+    startBreakTimer: '+Start',
+    cheatsheet: 'Cheatsheet',
+    todayContribution: 'Today',
+    targetLabel: 'Goal',
+    unitPriceLabel: 'Unit price',
   },
   de: {
     appTitle: 'GehaltsRechner',
@@ -286,6 +319,8 @@ export const L10N = {
     perSecond: 'Pro Sekunde',
     hourlyRate: 'Stundensatz',
     dailyRate: 'Tagessatz',
+    monthEarned: 'Diesen Monat',
+    monthProgress: 'Fortschritt',
     nextRest: 'Nächste Pause',
     weekend: 'Wochenende',
     holiday: 'Feiertag',
@@ -297,9 +332,18 @@ export const L10N = {
     paidBreakTitle: 'Bezahlte Kaffeepause / WC-Timer',
     stealthMode: 'Boss-Key (Tarnmodus)',
     equivalence: 'Belohnung',
+    earnedGoods: 'Heutige Sachwerte',
+    savingGoal: 'Sparziel',
     paydayCountdown: 'Bis zum Zahltag',
     wishlistGoal: 'Persönliches Sparziel',
     paydayEndOfMonth: 'Monatsende',
+    daysUnit: 'T',
+    hoursUnit: 'Std',
+    startBreakTimer: '+Starten',
+    cheatsheet: 'Tipps & Tricks',
+    todayContribution: 'Heute',
+    targetLabel: 'Ziel',
+    unitPriceLabel: 'Einzelpreis',
   },
   ja: {
     appTitle: '給料チャージャー',
@@ -309,6 +353,8 @@ export const L10N = {
     perSecond: '毎秒の稼ぎ',
     hourlyRate: '時給換算',
     dailyRate: '日給換算',
+    monthEarned: '今月の稼ぎ',
+    monthProgress: '達成率',
     nextRest: '次の休日',
     weekend: '週末',
     holiday: '祝日',
@@ -320,11 +366,50 @@ export const L10N = {
     paidBreakTitle: '有給休憩 / トイレタイマー',
     stealthMode: 'ボスキー (ステルスモード)',
     equivalence: 'ご褒美換算',
+    earnedGoods: '本日の獲得現物',
+    savingGoal: '貯金目標',
     paydayCountdown: '給料日まで',
     wishlistGoal: '個人目標・ウィッシュリスト',
     paydayEndOfMonth: '月末',
+    daysUnit: '日',
+    hoursUnit: '時間',
+    startBreakTimer: '+開始',
+    cheatsheet: '使い方のコツ',
+    todayContribution: '本日',
+    targetLabel: '目標',
+    unitPriceLabel: '単価',
   },
 };
+
+export function formatTenureText(years: number, months: number, lang: AppLanguage): string {
+  switch (lang) {
+    case 'zh': return `${years} 年 ${months} 个月`;
+    case 'fr': return `${years} ans ${months} mois`;
+    case 'en': return `${years} yrs ${months} mos`;
+    case 'de': return `${years} J ${months} M`;
+    case 'ja': return `${years} 年 ${months} ヶ月`;
+  }
+}
+
+export function formatRetirementYearsText(years: number, lang: AppLanguage): string {
+  switch (lang) {
+    case 'zh': return `${years} 年`;
+    case 'fr': return `${years} ans`;
+    case 'en': return `${years} yrs`;
+    case 'de': return `${years} Jahre`;
+    case 'ja': return `${years} 年`;
+  }
+}
+
+export function formatPaydayDayText(day: number, lang: AppLanguage): string {
+  switch (lang) {
+    case 'zh': return `每月 ${day} 号`;
+    case 'fr': return `Le ${day} du mois`;
+    case 'en': return `${day}th of month`;
+    case 'de': return `Am ${day}. d. Monats`;
+    case 'ja': return `毎月 ${day} 日`;
+  }
+}
 
 export const DEFAULT_SETTINGS: SalarySettings = {
   appLanguage: 'zh',

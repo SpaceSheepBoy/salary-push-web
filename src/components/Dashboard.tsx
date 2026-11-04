@@ -7,6 +7,9 @@ import {
   getCurrencySymbol,
   L10N,
   MOTIVATIONAL_QUOTES,
+  formatTenureText,
+  formatRetirementYearsText,
+  formatPaydayDayText,
 } from '../utils/constants';
 
 interface DashboardProps {
@@ -60,6 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const isWorking = calculator.isCurrentlyWorking(now);
   const todayEarned = calculator.todayEarnings(now);
   const todayEarnedFormatted = formatCurrencyValue(todayEarned, settings.displayCurrency, 2);
+  const monthInfo = calculator.monthToDateEarnings(now);
 
   const benefit = calculator.benefitSummary(now);
   const benefitFormatted = formatCurrencyValue(benefit.todayAccumulated, settings.displayCurrency, 2);
@@ -88,34 +92,34 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-1 text-grayteal">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-medium text-grayteal">{l10n.appTitle}</span>
-          <span className="text-[10px] opacity-60">SalaryPush · 上班加油</span>
+          <span className="font-medium text-xs text-white">{l10n.appTitle}</span>
+          <span className="text-[10px] opacity-60">SalaryPush</span>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {/* Mini Mode Toggle */}
           <button
             onClick={onToggleMini}
-            className="p-1 rounded text-grayteal hover:text-white hover:bg-white/5 transition-all"
-            title={isMini ? '展开完整面板 (Expand)' : '迷你悬浮窗 (Mini Mode)'}
+            className="hover:text-white transition-colors"
+            title={isMini ? 'Expand' : 'Mini Mode'}
           >
-            {isMini ? <Maximize2 className="w-3.5 h-3.5 text-mint" /> : <Minimize2 className="w-3.5 h-3.5" />}
+            {isMini ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
           </button>
 
-          {!isMini && (
-            <button
-              onClick={onToggleStealth}
-              className="p-1 rounded text-grayteal hover:text-white hover:bg-white/5 transition-all"
-              title="老板键 (ESC 隐身)"
-            >
-              <Eye className="w-3.5 h-3.5" />
-            </button>
-          )}
+          {/* Stealth Boss Key Toggle */}
+          <button
+            onClick={onToggleStealth}
+            className="hover:text-white transition-colors"
+            title={l10n.stealthMode}
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
 
+          {/* Settings */}
           <button
             onClick={onOpenSettings}
-            className="p-1 rounded text-grayteal hover:text-white hover:bg-white/5 transition-all"
-            title="设置"
+            className="hover:text-white transition-colors"
+            title="Settings"
           >
             <Settings className="w-3.5 h-3.5" />
           </button>
@@ -159,7 +163,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {isEuropean && <span className={`${isMini ? 'text-xl' : 'text-2xl'} ml-1`}>{sym}</span>}
           </div>
 
-          <p className="text-xs font-serif italic text-white/90 mt-1 transition-all">
+          {/* Month-to-Date Live Pill right under Hero Amount */}
+          <div className="mt-1 flex items-center justify-center gap-1.5 px-3 py-0.5 rounded-full bg-[#122429]/90 border border-[#1C363D] text-[11px] text-grayteal shadow-sm">
+            <span className="text-grayteal/80">{l10n.monthEarned}:</span>
+            <span className="font-bold text-mint font-mono">
+              {isEuropean
+                ? `${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)} ${sym}`
+                : `${sym}${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)}`}
+            </span>
+            <span className="text-[10px] text-grayteal/70">
+              ({l10n.monthProgress} {monthInfo.progressPercent.toFixed(1)}%)
+            </span>
+          </div>
+
+          <p className="text-xs font-serif italic text-white/90 mt-1.5 transition-all">
             {currentQuote}
           </p>
 
@@ -168,7 +185,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <button
               onClick={onCycleEquivalence}
               className="mt-2 px-2.5 py-1 rounded-full bg-[#081518] border border-[#14262A] hover:border-coral/40 text-[11px] text-white flex items-center gap-1.5 transition-all shadow-sm"
-              title={`点击切换实物奖励 · 单价: ${sym}${equivalence.formattedPrice}`}
+              title={`单价: ${sym}${equivalence.formattedPrice}`}
             >
               <span>{equivalence.item.icon}</span>
               {equivalence.isGoal ? (
@@ -189,10 +206,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Below sections are only shown in Full Mode */}
         {!isMini && (
           <>
-            {/* 3. 3-Column Stats Row (每秒进账, 时薪, 日薪) */}
-            <div className="grid grid-cols-3 gap-1 py-1 text-left border-y border-white/[0.04]">
+            {/* 3. 4-Column Stats Row (每秒进账, 时薪, 日薪, 本月已赚) */}
+            <div className="grid grid-cols-4 gap-1 py-1.5 text-left border-y border-white/[0.04]">
               <div>
-                <div className="text-[10px] text-grayteal">{l10n.perSecond}</div>
+                <div className="text-[10px] text-grayteal truncate">{l10n.perSecond}</div>
                 <div className="text-xs font-bold font-mono text-white truncate">
                   {isEuropean
                     ? `${formatCurrencyValue(calculator.perSecondEarnings, settings.displayCurrency, 5)} ${sym}`
@@ -201,7 +218,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               <div>
-                <div className="text-[10px] text-grayteal">{l10n.hourlyRate}</div>
+                <div className="text-[10px] text-grayteal truncate">{l10n.hourlyRate}</div>
                 <div className="text-xs font-bold font-mono text-white truncate">
                   {isEuropean
                     ? `${formatCurrencyValue(calculator.hourlyEarnings, settings.displayCurrency, 2)} ${sym}`
@@ -210,11 +227,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               <div>
-                <div className="text-[10px] text-grayteal">{l10n.dailyRate}</div>
+                <div className="text-[10px] text-grayteal truncate">{l10n.dailyRate}</div>
                 <div className="text-xs font-bold font-mono text-white truncate">
                   {isEuropean
                     ? `${formatCurrencyValue(calculator.dailyEarnings, settings.displayCurrency, 2)} ${sym}`
                     : `${sym}${formatCurrencyValue(calculator.dailyEarnings, settings.displayCurrency, 2)}`}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] text-mint/90 truncate">{l10n.monthEarned}</div>
+                <div className="text-xs font-bold font-mono text-mint truncate">
+                  {isEuropean
+                    ? `${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)} ${sym}`
+                    : `${sym}${formatCurrencyValue(monthInfo.totalEarned, settings.displayCurrency, 2)}`}
                 </div>
               </div>
             </div>
@@ -288,13 +314,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div>
                 <div className="text-[10px] text-grayteal">{l10n.workTenure}</div>
                 <div className="text-xs font-bold text-lavender mt-0.5">
-                  {tenure.years} 年 {tenure.months} 个月
+                  {formatTenureText(tenure.years, tenure.months, lang)}
                 </div>
               </div>
               <div>
                 <div className="text-[10px] text-grayteal">{l10n.yearsUntilRetirement}</div>
                 <div className="text-xs font-bold text-white mt-0.5">
-                  {retireYears} 年
+                  {formatRetirementYearsText(retireYears, lang)}
                 </div>
               </div>
             </div>
@@ -334,7 +360,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <button
                 onClick={onOpenSettings}
                 className="text-[10px] text-coral hover:underline flex items-center gap-1 transition-colors"
-                title="前往设置自定义心愿目标"
+                title="Settings"
               >
                 <span className="font-medium">{wishlist.name}</span>
                 <span className="text-grayteal/60 group-hover:text-coral transition-colors">✎</span>
@@ -344,11 +370,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold font-mono text-mint">{wishlist.progressPercent.toFixed(1)}%</span>
                 <span className="text-[10px] text-grayteal">
-                  今日进账 {sym}{formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}
+                  {l10n.todayContribution} {isEuropean ? `${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)} ${sym}` : `${sym}${formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}`}
                 </span>
               </div>
               <div className="text-[10px] font-mono text-grayteal">
-                目标 {sym}{wishlist.formattedPrice}
+                {l10n.targetLabel} {isEuropean ? `${wishlist.formattedPrice} ${sym}` : `${sym}${wishlist.formattedPrice}`}
               </div>
             </div>
             <div className="w-full h-1.5 bg-[#14262A] rounded-full overflow-hidden">
@@ -364,11 +390,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <button
               onClick={onCycleEquivalence}
               className="p-2.5 rounded-xl bg-cardbg/80 border border-cardborder text-left hover:border-coral/50 transition-all group flex flex-col justify-between"
-              title={`点击切换实物奖励 · 当前单价: ${sym}${equivalence.formattedPrice}`}
+              title={`单价: ${sym}${equivalence.formattedPrice}`}
             >
               <div className="text-[10px] text-grayteal flex items-center justify-between w-full">
-                <span>{equivalence.isGoal ? '🎯 攒钱目标' : '今日已赚实物'}</span>
-                <span className="text-[9px] text-coral opacity-0 group-hover:opacity-100 transition-opacity">切换 ↻</span>
+                <span>{equivalence.isGoal ? `🎯 ${l10n.savingGoal}` : l10n.earnedGoods}</span>
+                <span className="text-[9px] text-coral opacity-0 group-hover:opacity-100 transition-opacity">↻</span>
               </div>
               <div className="text-xs font-bold text-white mt-1 flex items-center gap-1 w-full truncate">
                 <span>{equivalence.item.icon}</span>
@@ -393,7 +419,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               ) : (
                 <div className="text-[9px] text-grayteal/60 truncate mt-0.5">
-                  单价 {sym}{equivalence.formattedPrice}
+                  {l10n.unitPriceLabel} {isEuropean ? `${equivalence.formattedPrice} ${sym}` : `${sym}${equivalence.formattedPrice}`}
                 </div>
               )}
             </button>
@@ -403,15 +429,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div className="text-[10px] text-grayteal flex items-center justify-between">
                 <span>{l10n.paydayCountdown}</span>
                 <span className="text-[9px] text-amberbadge">
-                  {payday.isEndOfMonth ? (l10n.paydayEndOfMonth || '每月月底') : `每月${settings.paydayDay}号`}
+                  {payday.isEndOfMonth ? l10n.paydayEndOfMonth : formatPaydayDayText(settings.paydayDay, lang)}
                 </span>
               </div>
               <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-amberbadge" />
                 <span className="font-mono">{payday.days}</span>
-                <span className="text-[10px] text-grayteal">天</span>
+                <span className="text-[10px] text-grayteal">{l10n.daysUnit}</span>
                 <span className="font-mono">{payday.hours}</span>
-                <span className="text-[10px] text-grayteal">时</span>
+                <span className="text-[10px] text-grayteal">{l10n.hoursUnit}</span>
               </div>
             </div>
           </div>
@@ -423,7 +449,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           >
             <Coffee className="w-4 h-4 text-coral group-hover:rotate-12 transition-transform" />
             <span>{l10n.paidBreakTitle}</span>
-            <span className="text-[10px] text-mint font-mono font-bold">+开始计时</span>
+            <span className="text-[10px] text-mint font-mono font-bold">{l10n.startBreakTimer}</span>
           </button>
 
           {/* Footer info & Usage Tips Toggle */}
@@ -433,7 +459,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               className="flex items-center gap-1 hover:text-white transition-colors"
             >
               <HelpCircle className="w-3 h-3 text-coral" />
-              <span>使用秘籍</span>
+              <span>{l10n.cheatsheet}</span>
               {showTips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
             <span>{now.toLocaleTimeString()}</span>
@@ -443,27 +469,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {showTips && (
             <div className="p-3 rounded-xl bg-[#091518] border border-[#16292E] text-left text-[11px] text-grayteal flex flex-col gap-1.5 animate-fadeIn">
               <div className="font-semibold text-white flex items-center gap-1.5 pb-1 border-b border-white/[0.06]">
-                <span>💡 上班加油器快捷指南</span>
+                <span>💡 {l10n.cheatsheet}</span>
               </div>
               <div className="flex items-start gap-1.5">
                 <span className="text-coral font-bold">⌨️ ESC:</span>
-                <span>老板键瞬间隐身（伪装成极简工作日历时钟，再按 ESC 或双击退出）</span>
+                <span>{lang === 'fr' ? 'Mode discret instantané (masque en horloge, ESC pour restaurer)' : lang === 'zh' ? '老板键瞬间隐身（伪装成极简日历时钟，再按 ESC 退出）' : lang === 'ja' ? 'ボスキーで瞬時に仕事用時計画面にカモフラージュ（ESCで復归）' : 'Instant Boss-Key stealth mode (minimal clock, ESC to restore)'}</span>
               </div>
               <div className="flex items-start gap-1.5">
-                <span className="text-mint font-bold">🪟 迷你模式:</span>
-                <span>点击右上角最小化图标或双击卡片，缩减为仅保留“今日已赚”超窄便签</span>
+                <span className="text-mint font-bold">🪟 Mini:</span>
+                <span>{lang === 'fr' ? 'Double-clic ou icône pour réduire en widget ultra-compact' : lang === 'zh' ? '点击右上角或双击卡片，缩减为超窄便签' : lang === 'ja' ? 'ダブルクリックで超省スペースなミニ付箋モードに切替' : 'Double-click or icon to collapse into ultra-compact widget'}</span>
               </div>
               <div className="flex items-start gap-1.5">
-                <span className="text-amberbadge font-bold">🎁 实物激励:</span>
-                <span>轻点实物卡片可循环切换咖啡、电影票、3A游戏、大件心愿单等目标</span>
+                <span className="text-amberbadge font-bold">🎁 Rewards:</span>
+                <span>{lang === 'fr' ? 'Cliquez sur la récompense pour faire défiler café, ciné, jeux, etc.' : lang === 'zh' ? '轻点实物卡片可循环切换咖啡、电影票、3A游戏、大件心愿单等目标' : lang === 'ja' ? 'カードをタップしてコーヒー、映画、ゲーム、目標を切替' : 'Tap rewards to cycle coffees, movies, games, wishlist'}</span>
               </div>
               <div className="flex items-start gap-1.5">
-                <span className="text-cyanaccent font-bold">💾 自动记忆:</span>
-                <span>所有薪资、国家福利与工作日配置全自动离线保存在本地浏览器中</span>
+                <span className="text-cyanaccent font-bold">💾 Offline:</span>
+                <span>{lang === 'fr' ? 'Toutes vos données et cotisations restent 100% locales' : lang === 'zh' ? '所有薪资、国家福利与工作日配置全自动离线保存在本地浏览器中' : lang === 'ja' ? '設定や福利厚生データはブラウザ内に安全に完全ローカル保存' : 'All salary and benefits data stays 100% offline in browser'}</span>
               </div>
               <div className="flex items-start gap-1.5">
-                <span className="text-lavender font-bold">📲 桌面安装:</span>
-                <span>支持 PWA，可在浏览器地址栏或分享菜单点击“添加到主屏幕/安装应用”</span>
+                <span className="text-lavender font-bold">📲 PWA:</span>
+                <span>{lang === 'fr' ? 'Installez en PWA via la barre du navigateur pour une app bureau' : lang === 'zh' ? '支持 PWA，可在浏览器地址栏或分享菜单点击“添加到主屏幕/安装应用”' : lang === 'ja' ? 'ブラウザのインストールボタンからデスクトップアプリとして使えます' : 'Install via browser address bar as a desktop app'}</span>
               </div>
             </div>
           )}
@@ -473,9 +499,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Mini Mode Footer Hint */}
       {isMini && (
         <div className="text-center text-[10px] text-grayteal/60 font-mono flex items-center justify-center gap-2">
-          <span>双击卡片展开完整面板</span>
+          <span>{lang === 'fr' ? 'Double-cliquez pour agrandir' : lang === 'zh' ? '双击卡片展开完整面板' : 'Double click to expand'}</span>
           <span>·</span>
-          <span>按 ESC 老板键</span>
+          <span>ESC</span>
         </div>
       )}
     </div>
