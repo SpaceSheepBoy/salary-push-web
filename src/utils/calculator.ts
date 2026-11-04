@@ -356,16 +356,59 @@ export class EarningsCalculator {
     };
   }
 
-  paydayCountdown(now: Date = new Date()): { days: number; hours: number } {
-    const payday = this.settings.paydayDay || 10;
-    const target = new Date(now.getFullYear(), now.getMonth(), payday, 0, 0, 0);
-    if (now.getDate() >= payday) {
-      target.setMonth(target.getMonth() + 1);
+  paydayCountdown(now: Date = new Date()): { days: number; hours: number; isEndOfMonth: boolean; displayLabel: string } {
+    const rawDay = this.settings.paydayDay;
+    const isEndOfMonth = rawDay === 0 || !rawDay || rawDay > 30;
+
+    let target: Date;
+    if (isEndOfMonth) {
+      // Last day of current month (e.g. Feb 28, Apr 30, May 31)
+      const lastDayCurrent = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      if (now.getTime() >= lastDayCurrent.getTime() - 86400000) {
+        // Today is the last day or past it, target last day of next month
+        target = new Date(now.getFullYear(), now.getMonth() + 2, 0, 0, 0, 0);
+      } else {
+        target = new Date(now.getFullYear(), now.getMonth() + 1, 0, 0, 0, 0);
+      }
+    } else {
+      target = new Date(now.getFullYear(), now.getMonth(), rawDay, 0, 0, 0);
+      if (now.getDate() >= rawDay) {
+        target.setMonth(target.getMonth() + 1);
+      }
     }
+
     const diffSec = Math.max(0, (target.getTime() - now.getTime()) / 1000);
     const days = Math.floor(diffSec / 86400);
     const hours = Math.floor((diffSec % 86400) / 3600);
-    return { days, hours };
+
+    return {
+      days,
+      hours,
+      isEndOfMonth,
+      displayLabel: isEndOfMonth ? '月底' : `${rawDay}号`,
+    };
+  }
+
+  // Dedicated Private Custom Wishlist progress
+  customWishlistGoal(earnedToday: number): {
+    name: string;
+    price: number;
+    formattedPrice: string;
+    todayEarned: number;
+    progressPercent: number;
+  } {
+    const name = this.settings.customWishlistName || '我的私人心愿';
+    const price = Math.max(1, this.settings.customWishlistPrice || 2000);
+    const progressPercent = Math.min(100, (earnedToday / price) * 100);
+    const formattedPrice = formatCurrencyValue(price, this.settings.displayCurrency, 2);
+
+    return {
+      name,
+      price,
+      formattedPrice,
+      todayEarned: earnedToday,
+      progressPercent,
+    };
   }
 
   // Enhanced Reward / Equivalence System

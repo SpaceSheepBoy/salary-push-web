@@ -79,6 +79,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const equivalence = calculator.salaryEquivalence(todayEarned);
   const payday = calculator.paydayCountdown(now);
+  const wishlist = calculator.customWishlistGoal(todayEarned);
 
   const isMini = settings.isMiniMode;
 
@@ -323,6 +324,41 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Extra Interactive Cards (Full Mode Only) */}
       {!isMini && (
         <>
+          {/* Dedicated Private Wishlist Milestone Goal */}
+          <div className="p-2.5 rounded-xl bg-cardbg/80 border border-cardborder text-left hover:border-mint/50 transition-all group">
+            <div className="text-[10px] text-grayteal flex items-center justify-between w-full mb-1">
+              <span className="flex items-center gap-1 font-semibold text-white">
+                <span className="text-sm">🎯</span>
+                <span>{l10n.wishlistGoal || '私人心愿目标'}</span>
+              </span>
+              <button
+                onClick={onOpenSettings}
+                className="text-[10px] text-coral hover:underline flex items-center gap-1 transition-colors"
+                title="前往设置自定义心愿目标"
+              >
+                <span className="font-medium">{wishlist.name}</span>
+                <span className="text-grayteal/60 group-hover:text-coral transition-colors">✎</span>
+              </button>
+            </div>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold font-mono text-mint">{wishlist.progressPercent.toFixed(1)}%</span>
+                <span className="text-[10px] text-grayteal">
+                  今日进账 {sym}{formatCurrencyValue(wishlist.todayEarned, settings.displayCurrency, 2)}
+                </span>
+              </div>
+              <div className="text-[10px] font-mono text-grayteal">
+                目标 {sym}{wishlist.formattedPrice}
+              </div>
+            </div>
+            <div className="w-full h-1.5 bg-[#14262A] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-mint to-cyanaccent rounded-full transition-all duration-300"
+                style={{ width: `${Math.max(1.5, Math.min(100, wishlist.progressPercent))}%` }}
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             {/* Equivalence Pill */}
             <button
@@ -366,7 +402,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="p-2 rounded-xl bg-cardbg/80 border border-cardborder text-left">
               <div className="text-[10px] text-grayteal flex items-center justify-between">
                 <span>{l10n.paydayCountdown}</span>
-                <span className="text-[9px] text-amberbadge">每月{settings.paydayDay}号</span>
+                <span className="text-[9px] text-amberbadge">
+                  {payday.isEndOfMonth ? (l10n.paydayEndOfMonth || '每月月底') : `每月${settings.paydayDay}号`}
+                </span>
               </div>
               <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-amberbadge" />

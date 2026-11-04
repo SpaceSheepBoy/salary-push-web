@@ -352,15 +352,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[11px] text-grayteal block mb-0.5">每月发薪日 (号)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  value={settings.paydayDay}
+                <label className="text-[11px] text-grayteal block mb-0.5">每月发薪日</label>
+                <select
+                  value={settings.paydayDay ?? 0}
                   onChange={(e) => handleChange('paydayDay', Number(e.target.value))}
                   className="w-full bg-[#14262A] border border-[#1F3238] text-white text-xs rounded-lg px-2 py-1"
-                />
+                >
+                  <option value={0}>📅 每月月底 (默认)</option>
+                  <option value={1}>每月 1 号</option>
+                  <option value={5}>每月 5 号</option>
+                  <option value={8}>每月 8 号</option>
+                  <option value={10}>每月 10 号</option>
+                  <option value={15}>每月 15 号</option>
+                  <option value={20}>每月 20 号</option>
+                  <option value={25}>每月 25 号</option>
+                  <option value={28}>每月 28 号</option>
+                  <option value={30}>每月 30 号</option>
+                </select>
               </div>
             </div>
           </div>

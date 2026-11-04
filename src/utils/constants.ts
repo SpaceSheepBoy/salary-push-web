@@ -229,6 +229,8 @@ export const L10N = {
     stealthMode: '老板键 (隐身模式)',
     equivalence: '实物激励',
     paydayCountdown: '距发薪日',
+    wishlistGoal: '私人心愿目标',
+    paydayEndOfMonth: '每月月底',
   },
   fr: {
     appTitle: 'Booster Salaire',
@@ -250,6 +252,8 @@ export const L10N = {
     stealthMode: 'Mode Discret (Boss Key)',
     equivalence: 'Récompense',
     paydayCountdown: 'Avant la paie',
+    wishlistGoal: 'Objectif Personnel',
+    paydayEndOfMonth: 'Fin de mois',
   },
   en: {
     appTitle: 'Work Fuel',
@@ -271,6 +275,8 @@ export const L10N = {
     stealthMode: 'Stealth Boss Key',
     equivalence: 'Rewards',
     paydayCountdown: 'Until Payday',
+    wishlistGoal: 'Private Wishlist Goal',
+    paydayEndOfMonth: 'End of Month',
   },
   de: {
     appTitle: 'GehaltsRechner',
@@ -292,6 +298,8 @@ export const L10N = {
     stealthMode: 'Boss-Key (Tarnmodus)',
     equivalence: 'Belohnung',
     paydayCountdown: 'Bis zum Zahltag',
+    wishlistGoal: 'Persönliches Sparziel',
+    paydayEndOfMonth: 'Monatsende',
   },
   ja: {
     appTitle: '給料チャージャー',
@@ -313,6 +321,8 @@ export const L10N = {
     stealthMode: 'ボスキー (ステルスモード)',
     equivalence: 'ご褒美換算',
     paydayCountdown: '給料日まで',
+    wishlistGoal: '個人目標・ウィッシュリスト',
+    paydayEndOfMonth: '月末',
   },
 };
 
@@ -362,7 +372,7 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   customEmployerMatch: true,
 
   isMiniMode: false,
-  paydayDay: 10,
+  paydayDay: 0, // 0 = 月底最后一天 (默认)
   soundEnabled: false,
   activeEquivalenceId: 'latte',
   customWishlistName: 'PS5 Pro 游戏机',
