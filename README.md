@@ -2,6 +2,9 @@
 
 <div align="center">
 
+<img src="docs/icon.png" width="128" height="128" alt="WorkFuel Icon" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-bottom: 16px;" />
+<br/>
+
 ![Platform Web](https://img.shields.io/badge/Platform-Web%20%7C%20PWA-blue?style=for-the-badge)
 ![License MIT](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 [![Live Web App](https://img.shields.io/badge/Online%20Web%20App-Visit%20Now-ff69b4?style=for-the-badge)](https://salary-push-web.vercel.app)
