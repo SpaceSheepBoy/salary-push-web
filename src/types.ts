@@ -82,6 +82,7 @@ export interface SalarySettings {
   activeEquivalenceId: string;
   customWishlistName: string;
   customWishlistPrice: number;
+  customWishlistCurrency?: string;
 }
 
 export interface BenefitSummary {

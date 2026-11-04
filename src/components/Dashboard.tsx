@@ -375,6 +375,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div className="text-[10px] font-mono text-grayteal">
                 {l10n.targetLabel} {isEuropean ? `${wishlist.formattedPrice} ${sym}` : `${sym}${wishlist.formattedPrice}`}
+                {wishlist.rawCurrency !== settings.displayCurrency && (
+                  <span className="text-[9px] text-grayteal/70 ml-1">
+                    ({wishlist.rawPrice} {getCurrencySymbol(wishlist.rawCurrency)})
+                  </span>
+                )}
               </div>
             </div>
             <div className="w-full h-1.5 bg-[#14262A] rounded-full overflow-hidden">

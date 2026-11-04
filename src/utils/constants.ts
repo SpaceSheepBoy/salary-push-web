@@ -462,7 +462,41 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   activeEquivalenceId: 'latte',
   customWishlistName: 'PS5 游戏机 (光驱版)',
   customWishlistPrice: 3599,
+  customWishlistCurrency: 'CNY',
 };
+
+export const BASELINE_USD_RATES: Record<string, number> = {
+  USD: 1.0,
+  EUR: 0.92,
+  CNY: 7.23,
+  GBP: 0.77,
+  JPY: 152.0,
+  CHF: 0.88,
+  HKD: 7.78,
+  AUD: 1.52,
+  CAD: 1.38,
+  SGD: 1.32,
+};
+
+export function getExchangeRate(fromCurrency: string, toCurrency: string): number {
+  const from = (fromCurrency || 'USD').toUpperCase();
+  const to = (toCurrency || 'USD').toUpperCase();
+  if (from === to) return 1.0;
+
+  let rates = BASELINE_USD_RATES;
+  try {
+    const cached = localStorage.getItem('salary_push_exchange_rates');
+    if (cached) {
+      rates = { ...BASELINE_USD_RATES, ...JSON.parse(cached) };
+    }
+  } catch {
+    // fallback
+  }
+
+  const fromRate = rates[from] || 1.0;
+  const toRate = rates[to] || 1.0;
+  return toRate / fromRate;
+}
 
 export function getCountryDefaults(country: CountrySystem): Partial<SalarySettings> {
   switch (country) {
@@ -478,6 +512,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'zh',
         customWishlistName: 'PS5 游戏机 (光驱版)',
         customWishlistPrice: 3599, // 🇨🇳 国行官方建议零售价
+        customWishlistCurrency: 'CNY',
       };
     case 'france':
       return {
@@ -492,6 +527,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'fr',
         customWishlistName: 'Console PS5',
         customWishlistPrice: 549, // 🇫🇷 欧洲官方售价 549.99 €
+        customWishlistCurrency: 'EUR',
       };
     case 'germany':
       return {
@@ -507,6 +543,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'de',
         customWishlistName: 'PS5 Konsole',
         customWishlistPrice: 549, // 🇩🇪 欧洲官方售价 549.99 €
+        customWishlistCurrency: 'EUR',
       };
     case 'uk':
       return {
@@ -522,6 +559,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'en',
         customWishlistName: 'PS5 Console',
         customWishlistPrice: 479, // 🇬🇧 英国官方售价 £479.99
+        customWishlistCurrency: 'GBP',
       };
     case 'japan':
       return {
@@ -536,6 +574,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'ja',
         customWishlistName: 'PS5 本体',
         customWishlistPrice: 79980, // 🇯🇵 日本官方定価 ¥79,980
+        customWishlistCurrency: 'JPY',
       };
     case 'us':
       return {
@@ -549,6 +588,7 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         appLanguage: 'en',
         customWishlistName: 'PS5 Console',
         customWishlistPrice: 499, // 🇺🇸 美国官方建议售价 $499.99
+        customWishlistCurrency: 'USD',
       };
     case 'custom':
       return {

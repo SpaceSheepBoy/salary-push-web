@@ -1,5 +1,5 @@
 import { AppLanguage, BenefitSummary, NextRestInfo, SalarySettings } from '../types';
-import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol } from './constants';
+import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol, getExchangeRate } from './constants';
 
 export class EarningsCalculator {
   settings: SalarySettings;
@@ -394,18 +394,32 @@ export class EarningsCalculator {
     name: string;
     price: number;
     formattedPrice: string;
+    rawPrice: number;
+    rawCurrency: string;
     todayEarned: number;
     progressPercent: number;
   } {
     const name = this.settings.customWishlistName || '我的私人心愿';
-    const price = Math.max(1, this.settings.customWishlistPrice || 2000);
-    const progressPercent = Math.min(100, (earnedToday / price) * 100);
-    const formattedPrice = formatCurrencyValue(price, this.settings.displayCurrency, 2);
+    const rawPrice = Math.max(1, this.settings.customWishlistPrice || 2000);
+    const wishlistCurr = (this.settings.customWishlistCurrency || this.settings.displayCurrency).toUpperCase();
+    const displayCurr = this.settings.displayCurrency.toUpperCase();
+
+    // Convert rawPrice to displayCurrency if different
+    let convertedPrice = rawPrice;
+    if (wishlistCurr !== displayCurr) {
+      const convRate = getExchangeRate(wishlistCurr, displayCurr);
+      convertedPrice = rawPrice * convRate;
+    }
+
+    const progressPercent = Math.min(100, (earnedToday / Math.max(0.01, convertedPrice)) * 100);
+    const formattedPrice = formatCurrencyValue(convertedPrice, this.settings.displayCurrency, 2);
 
     return {
       name,
-      price,
+      price: convertedPrice,
       formattedPrice,
+      rawPrice,
+      rawCurrency: wishlistCurr,
       todayEarned: earnedToday,
       progressPercent,
     };
@@ -475,7 +489,9 @@ export class EarningsCalculator {
 
     let unitPrice = 32;
     if (item.id === 'custom_wishlist') {
-      unitPrice = this.settings.customWishlistPrice || 2000;
+      const rawPrice = this.settings.customWishlistPrice || 2000;
+      const wishlistCurr = (this.settings.customWishlistCurrency || this.settings.displayCurrency).toUpperCase();
+      unitPrice = wishlistCurr === curr ? rawPrice : rawPrice * getExchangeRate(wishlistCurr, curr);
       item = {
         ...item,
         name: this.settings.customWishlistName || '我的心愿单',

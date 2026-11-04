@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Globe, DollarSign, Clock, Calendar, Check, Gift, Calculator } from 'lucide-react';
 import { AppLanguage, CountrySystem, FranceDisplayFocus, FranceStatus, SalaryInputMode, SalarySettings } from '../types';
-import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCountryDefaults, getCurrencySymbol, SUPPORTED_CURRENCIES } from '../utils/constants';
+import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCountryDefaults, getCurrencySymbol, getExchangeRate, SUPPORTED_CURRENCIES } from '../utils/constants';
 import { EarningsCalculator } from '../utils/calculator';
 
 interface SettingsModalProps {
@@ -505,15 +505,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-grayteal block mb-0.5">目标金额 ({sym})</label>
-                  <input
-                    type="number"
-                    value={settings.customWishlistPrice}
-                    onChange={(e) => handleChange('customWishlistPrice', Number(e.target.value))}
-                    className="w-full bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1 font-mono"
-                  />
+                  <label className="text-[10px] text-grayteal block mb-0.5">目标金额与币种</label>
+                  <div className="flex gap-1.5 items-center">
+                    <input
+                      type="number"
+                      value={settings.customWishlistPrice}
+                      onChange={(e) => handleChange('customWishlistPrice', Number(e.target.value))}
+                      className="w-full flex-1 bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1 font-mono"
+                    />
+                    <select
+                      value={settings.customWishlistCurrency || settings.displayCurrency}
+                      onChange={(e) => handleChange('customWishlistCurrency', e.target.value)}
+                      className="bg-[#0E2024] border border-[#1F3238] text-white text-xs rounded px-2 py-1 focus:outline-none"
+                    >
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.symbol} {c.id}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
+              {(settings.customWishlistCurrency || settings.displayCurrency) !== settings.displayCurrency && (
+                <div className="text-[10px] text-mint flex items-center justify-between pt-0.5 border-t border-[#1E363D]">
+                  <span className="text-grayteal">折合显示币种 ({settings.displayCurrency}):</span>
+                  <span className="font-mono font-bold">
+                    {getCurrencySymbol(settings.displayCurrency)}
+                    {formatCurrencyValue(
+                      settings.customWishlistPrice * getExchangeRate(settings.customWishlistCurrency || settings.displayCurrency, settings.displayCurrency),
+                      settings.displayCurrency,
+                      2
+                    )} {settings.displayCurrency}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
