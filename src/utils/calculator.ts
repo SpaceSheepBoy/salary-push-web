@@ -436,9 +436,16 @@ export class EarningsCalculator {
         unitPrice = item.prices.EUR;
       } else if (curr === 'USD') {
         unitPrice = item.prices.USD;
-      } else {
-        // Base CNY price, scaled if different currency
+      } else if (curr === 'GBP' && item.prices.GBP) {
+        unitPrice = item.prices.GBP;
+      } else if (curr === 'JPY' && item.prices.JPY) {
+        unitPrice = item.prices.JPY;
+      } else if (curr === 'CNY') {
         unitPrice = item.prices.CNY;
+      } else {
+        // Fallback for other currencies: convert from USD or CNY
+        const baseUSD = item.prices.USD || (item.prices.CNY / 7.2);
+        unitPrice = baseUSD * (this.exchangeRate > 0 ? this.exchangeRate : 1.0);
       }
     }
 

@@ -57,70 +57,86 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
   // 1. 日常小确幸 (Daily treats)
   {
     id: 'latte',
-    name: '星巴克拿铁',
+    name: '星巴克大杯拿铁',
     icon: '☕️',
     unit: '杯',
-    prices: { CNY: 32, EUR: 4.5, USD: 5.5 },
+    prices: { CNY: 32, EUR: 4.8, USD: 5.45, GBP: 3.95, JPY: 540 },
   },
   {
     id: 'boba',
     name: '喜茶/霸王茶姬',
     icon: '🧋',
     unit: '杯',
-    prices: { CNY: 18, EUR: 6.5, USD: 6.0 },
+    prices: { CNY: 18, EUR: 6.8, USD: 6.5, GBP: 5.2, JPY: 680 },
   },
   {
     id: 'meal',
-    name: '豪华打工午餐',
+    name: '打工午市套餐',
     icon: '🍱',
     unit: '顿',
-    prices: { CNY: 38, EUR: 13.0, USD: 15.0 },
+    prices: { CNY: 35, EUR: 14.5, USD: 15.0, GBP: 11.5, JPY: 1100 },
   },
 
   // 2. 休闲与犒赏 (Entertainment & Fun)
   {
     id: 'movie',
-    name: 'IMAX 电影票',
+    name: '电影院正价票',
     icon: '🎬',
     unit: '张',
-    prices: { CNY: 55, EUR: 14.0, USD: 16.0 },
+    prices: { CNY: 50, EUR: 13.5, USD: 15.5, GBP: 12.5, JPY: 2000 },
   },
   {
     id: 'fuel',
     name: '10升汽车汽油',
     icon: '⛽️',
     unit: '桶',
-    prices: { CNY: 82, EUR: 18.5, USD: 11.0 },
+    prices: { CNY: 80, EUR: 18.5, USD: 9.5, GBP: 14.5, JPY: 1750 },
   },
   {
     id: 'pet_food',
     name: '进口优质猫/狗粮',
     icon: '🐱',
     unit: '包',
-    prices: { CNY: 160, EUR: 28.0, USD: 30.0 },
+    prices: { CNY: 180, EUR: 26.0, USD: 28.0, GBP: 22.0, JPY: 4200 },
   },
   {
     id: 'steam_game',
     name: 'Steam 3A游戏大作',
     icon: '🎮',
     unit: '部',
-    prices: { CNY: 268, EUR: 59.99, USD: 59.99 },
+    prices: { CNY: 298, EUR: 69.99, USD: 69.99, GBP: 59.99, JPY: 8800 },
   },
   {
     id: 'massage',
-    name: '周末泰式全身SPA',
+    name: '周末全身SPA按摩',
     icon: '💆',
     unit: '次',
-    prices: { CNY: 198, EUR: 65.0, USD: 75.0 },
+    prices: { CNY: 198, EUR: 65.0, USD: 75.0, GBP: 55.0, JPY: 7500 },
   },
 
   // 3. 梦想与大件大目标 (Big milestones with progress %)
   {
     id: 'airpods',
-    name: 'AirPods Pro 耳机',
+    name: 'AirPods Pro 2',
     icon: '🎧',
     unit: '部',
-    prices: { CNY: 1899, EUR: 279, USD: 249 },
+    prices: { CNY: 1899, EUR: 279, USD: 249, GBP: 229, JPY: 39800 },
+    isGoal: true,
+  },
+  {
+    id: 'ps5',
+    name: 'PS5 游戏机 (光驱版)',
+    icon: '🕹️',
+    unit: '台',
+    prices: { CNY: 3599, EUR: 549, USD: 499, GBP: 479, JPY: 79980 },
+    isGoal: true,
+  },
+  {
+    id: 'iphone',
+    name: 'iPhone 16 Pro',
+    icon: '📱',
+    unit: '台',
+    prices: { CNY: 7999, EUR: 1229, USD: 999, GBP: 999, JPY: 159800 },
     isGoal: true,
   },
   {
@@ -128,23 +144,7 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '海岛往返度假机票',
     icon: '🏖',
     unit: '趟',
-    prices: { CNY: 2500, EUR: 450, USD: 500 },
-    isGoal: true,
-  },
-  {
-    id: 'iphone',
-    name: 'iPhone 16 Pro 手机',
-    icon: '📱',
-    unit: '台',
-    prices: { CNY: 7999, EUR: 1229, USD: 999 },
-    isGoal: true,
-  },
-  {
-    id: 'luxury_bag',
-    name: '心动大牌轻奢包包',
-    icon: '🎒',
-    unit: '只',
-    prices: { CNY: 6000, EUR: 950, USD: 1000 },
+    prices: { CNY: 2600, EUR: 450, USD: 500, GBP: 380, JPY: 68000 },
     isGoal: true,
   },
   {
@@ -152,7 +152,7 @@ export const EQUIVALENCE_CATALOG: EquivalenceItem[] = [
     name: '我的私人心愿单',
     icon: '✨',
     unit: '个',
-    prices: { CNY: 2000, EUR: 300, USD: 300 },
+    prices: { CNY: 3599, EUR: 549, USD: 499, GBP: 479, JPY: 79980 },
     isGoal: true,
   },
 ];
@@ -375,8 +375,8 @@ export const DEFAULT_SETTINGS: SalarySettings = {
   paydayDay: 0, // 0 = 月底最后一天 (默认)
   soundEnabled: false,
   activeEquivalenceId: 'latte',
-  customWishlistName: 'PS5 Pro 游戏机',
-  customWishlistPrice: 4299,
+  customWishlistName: 'PS5 游戏机 (光驱版)',
+  customWishlistPrice: 3599,
 };
 
 export function getCountryDefaults(country: CountrySystem): Partial<SalarySettings> {
@@ -391,6 +391,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         annualPublicHolidays: 11,
         retirementAge: 60,
         appLanguage: 'zh',
+        customWishlistName: 'PS5 游戏机 (光驱版)',
+        customWishlistPrice: 3599, // 🇨🇳 国行官方建议零售价
       };
     case 'france':
       return {
@@ -403,6 +405,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         franceRTTDays: 10,
         retirementAge: 64,
         appLanguage: 'fr',
+        customWishlistName: 'Console PS5',
+        customWishlistPrice: 549, // 🇫🇷 欧洲官方售价 549.99 €
       };
     case 'germany':
       return {
@@ -416,6 +420,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         germanyIncludeHealth: true,
         retirementAge: 67,
         appLanguage: 'de',
+        customWishlistName: 'PS5 Konsole',
+        customWishlistPrice: 549, // 🇩🇪 欧洲官方售价 549.99 €
       };
     case 'uk':
       return {
@@ -429,6 +435,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         ukEmployerMatchRate: 3.0,
         retirementAge: 66,
         appLanguage: 'en',
+        customWishlistName: 'PS5 Console',
+        customWishlistPrice: 479, // 🇬🇧 英国官方售价 £479.99
       };
     case 'japan':
       return {
@@ -441,6 +449,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         japanSocialInsuranceRate: 15.0,
         retirementAge: 65,
         appLanguage: 'ja',
+        customWishlistName: 'PS5 本体',
+        customWishlistPrice: 79980, // 🇯🇵 日本官方定価 ¥79,980
       };
     case 'us':
       return {
@@ -452,6 +462,8 @@ export function getCountryDefaults(country: CountrySystem): Partial<SalarySettin
         annualPublicHolidays: 10,
         retirementAge: 67,
         appLanguage: 'en',
+        customWishlistName: 'PS5 Console',
+        customWishlistPrice: 499, // 🇺🇸 美国官方建议售价 $499.99
       };
     case 'custom':
       return {

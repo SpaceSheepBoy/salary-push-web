@@ -9,11 +9,13 @@ export interface EquivalenceItem {
   name: string;
   icon: string;
   unit: string;
-  // Prices in CNY, EUR, USD
+  // Prices in CNY, EUR, USD, GBP, JPY
   prices: {
     CNY: number;
     EUR: number;
     USD: number;
+    GBP?: number;
+    JPY?: number;
   };
   isGoal?: boolean; // If true, displays progress bar (e.g. AirPods, iPhone)
 }
