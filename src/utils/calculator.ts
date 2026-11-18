@@ -1,13 +1,13 @@
 import { AppLanguage, BenefitSummary, DayStripItem, NextRestInfo, SalarySettings } from '../types';
-import { EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol, getExchangeRate } from './constants';
+import { BASELINE_USD_RATES, EQUIVALENCE_CATALOG, formatCurrencyValue, getCurrencySymbol, getExchangeRate } from './constants';
 
 export class EarningsCalculator {
   settings: SalarySettings;
   exchangeRate: number; // from salaryCurrency to displayCurrency
 
-  constructor(settings: SalarySettings, exchangeRate: number = 1.0) {
+  constructor(settings: SalarySettings, private rates = BASELINE_USD_RATES) {
     this.settings = settings;
-    this.exchangeRate = exchangeRate;
+    this.exchangeRate = getExchangeRate(settings.salaryCurrency, settings.displayCurrency, rates);
   }
 
   get annualSalary(): number {
@@ -532,7 +532,7 @@ export class EarningsCalculator {
     let convertedPrice = rawPrice;
     let convertedSaved = rawSaved;
     if (wishlistCurr !== displayCurr) {
-      const convRate = getExchangeRate(wishlistCurr, displayCurr);
+      const convRate = getExchangeRate(wishlistCurr, displayCurr, this.rates);
       convertedPrice = rawPrice * convRate;
       convertedSaved = rawSaved * convRate;
     }
@@ -634,7 +634,7 @@ export class EarningsCalculator {
     if (item.id === 'custom_wishlist') {
       const rawPrice = this.settings.customWishlistPrice || 2000;
       const wishlistCurr = (this.settings.customWishlistCurrency || this.settings.displayCurrency).toUpperCase();
-      unitPrice = wishlistCurr === curr ? rawPrice : rawPrice * getExchangeRate(wishlistCurr, curr);
+      unitPrice = rawPrice * getExchangeRate(wishlistCurr, curr, this.rates);
       item = {
         ...item,
         name: this.settings.customWishlistName || '我的心愿单',
@@ -653,7 +653,7 @@ export class EarningsCalculator {
       } else {
         // Fallback for other currencies: convert from USD or CNY
         const baseUSD = item.prices.USD || (item.prices.CNY / 7.2);
-        unitPrice = baseUSD * (this.exchangeRate > 0 ? this.exchangeRate : 1.0);
+        unitPrice = baseUSD * getExchangeRate('USD', curr, this.rates);
       }
     }
 

@@ -16,7 +16,7 @@ import {
 
 interface DashboardProps {
   settings: SalarySettings;
-  exchangeRate: number;
+  calculator: EarningsCalculator;
   onOpenSettings: () => void;
   onOpenPaidBreak: () => void;
   onToggleStealth: () => void;
@@ -26,7 +26,7 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({
   settings,
-  exchangeRate,
+  calculator,
   onOpenSettings,
   onOpenPaidBreak,
   onToggleStealth,
@@ -56,7 +56,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  const calculator = new EarningsCalculator(settings, exchangeRate);
   const lang = settings.appLanguage;
   const l10n = L10N[lang];
   const sym = getCurrencySymbol(settings.displayCurrency);

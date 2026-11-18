@@ -18,6 +18,7 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: SalarySettings;
+  rates: Record<string, number>;
   onUpdate: (newSettings: SalarySettings) => void;
 }
 
@@ -25,6 +26,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   settings,
+  rates,
   onUpdate,
 }) => {
   if (!isOpen) return null;
@@ -261,7 +263,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const isEuropean = ['EUR', 'CHF'].includes(settings.displayCurrency.toUpperCase());
 
   // Real-time calculation preview
-  const calc = new EarningsCalculator(settings, 1.0);
+  const calc = new EarningsCalculator(settings);
   const sym = getCurrencySymbol(settings.salaryCurrency);
 
   return (
@@ -918,7 +920,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <span className="font-mono font-bold">
                     {getCurrencySymbol(settings.displayCurrency)}
                     {formatCurrencyValue(
-                      settings.customWishlistPrice * getExchangeRate(settings.customWishlistCurrency || settings.displayCurrency, settings.displayCurrency),
+                      settings.customWishlistPrice * getExchangeRate(settings.customWishlistCurrency || settings.displayCurrency, settings.displayCurrency, rates),
                       settings.displayCurrency,
                       2
                     )} {settings.displayCurrency}

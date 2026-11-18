@@ -727,25 +727,34 @@ export const BASELINE_USD_RATES: Record<string, number> = {
   JPY: 152.0,
   CHF: 0.88,
   HKD: 7.78,
+  TWD: 32.97,
   AUD: 1.52,
   CAD: 1.38,
   SGD: 1.32,
+  KRW: 1335.36,
 };
 
-export function getExchangeRate(fromCurrency: string, toCurrency: string): number {
+export function normalizeExchangeRates(data: unknown): Record<string, number> | undefined {
+  if (!data || typeof data !== 'object') return undefined;
+
+  const rates = Object.fromEntries(
+    Object.entries(data).filter(([currency, rate]) =>
+      /^[A-Z]{3}$/.test(currency) && Number.isFinite(rate) && rate > 0
+    )
+  );
+  if (rates.USD !== 1) return undefined;
+
+  return { ...BASELINE_USD_RATES, ...rates };
+}
+
+export function getExchangeRate(
+  fromCurrency: string,
+  toCurrency: string,
+  rates: Record<string, number> = BASELINE_USD_RATES,
+): number {
   const from = (fromCurrency || 'USD').toUpperCase();
   const to = (toCurrency || 'USD').toUpperCase();
   if (from === to) return 1.0;
-
-  let rates = BASELINE_USD_RATES;
-  try {
-    const cached = localStorage.getItem('salary_push_exchange_rates');
-    if (cached) {
-      rates = { ...BASELINE_USD_RATES, ...JSON.parse(cached) };
-    }
-  } catch {
-    // fallback
-  }
 
   const fromRate = rates[from] || 1.0;
   const toRate = rates[to] || 1.0;

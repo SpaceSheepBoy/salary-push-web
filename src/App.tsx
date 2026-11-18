@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DEFAULT_SETTINGS, EQUIVALENCE_CATALOG } from './utils/constants';
+import { BASELINE_USD_RATES, DEFAULT_SETTINGS, EQUIVALENCE_CATALOG, normalizeExchangeRates } from './utils/constants';
 import { SalarySettings } from './types';
 import { Dashboard } from './components/Dashboard';
 import { SettingsModal } from './components/SettingsModal';
@@ -23,7 +23,14 @@ export default function App() {
     return DEFAULT_SETTINGS;
   });
 
-  const [exchangeRate, setExchangeRate] = useState<number>(1.0);
+  const [rates, setRates] = useState(() => {
+    try {
+      const cached = localStorage.getItem(RATES_CACHE_KEY) ?? localStorage.getItem('salary_push_exchange_rates');
+      return normalizeExchangeRates(JSON.parse(cached ?? 'null')) ?? BASELINE_USD_RATES;
+    } catch {
+      return BASELINE_USD_RATES;
+    }
+  });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPaidBreakOpen, setIsPaidBreakOpen] = useState(false);
   const [isStealthMode, setIsStealthMode] = useState(false);
@@ -40,45 +47,26 @@ export default function App() {
 
   // Fetch live exchange rates
   useEffect(() => {
+    const controller = new AbortController();
     const fetchRates = async () => {
       try {
-        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.rates) {
-            localStorage.setItem(RATES_CACHE_KEY, JSON.stringify(data.rates));
-            computeRate(data.rates);
-          }
-        }
-      } catch {
-        // Fallback to cached rates
-        try {
-          const cached = localStorage.getItem(RATES_CACHE_KEY);
-          if (cached) {
-            computeRate(JSON.parse(cached));
-          }
-        } catch {
-          // ignore
-        }
-      }
-    };
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD', { signal: controller.signal });
+        if (!res.ok) return;
 
-    const computeRate = (rates: Record<string, number>) => {
-      const from = settings.salaryCurrency.toUpperCase();
-      const to = settings.displayCurrency.toUpperCase();
-      if (from === to) {
-        setExchangeRate(1.0);
-        return;
-      }
-      const fromRate = rates[from];
-      const toRate = rates[to];
-      if (fromRate && toRate && fromRate > 0) {
-        setExchangeRate(toRate / fromRate);
+        const data = await res.json();
+        const updatedRates = normalizeExchangeRates(data?.rates);
+        if (!updatedRates || controller.signal.aborted) return;
+
+        setRates(updatedRates);
+        localStorage.setItem(RATES_CACHE_KEY, JSON.stringify(updatedRates));
+      } catch {
+        // Keep the rates already in memory if the request or cache write fails.
       }
     };
 
     fetchRates();
-  }, [settings.salaryCurrency, settings.displayCurrency]);
+    return () => controller.abort();
+  }, []);
 
   // Global Keyboard shortcut: Esc to toggle Boss / Stealth Mode
   useEffect(() => {
@@ -108,7 +96,7 @@ export default function App() {
     });
   };
 
-  const calculator = new EarningsCalculator(settings, exchangeRate);
+  const calculator = new EarningsCalculator(settings, rates);
   const now = new Date();
   const todayEarned = calculator.todayEarnings(now);
 
@@ -124,7 +112,7 @@ export default function App() {
         <>
           <Dashboard
             settings={settings}
-            exchangeRate={exchangeRate}
+            calculator={calculator}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenPaidBreak={() => setIsPaidBreakOpen(true)}
             onToggleStealth={() => setIsStealthMode(true)}
@@ -136,6 +124,7 @@ export default function App() {
             isOpen={isSettingsOpen}
             onClose={() => setIsSettingsOpen(false)}
             settings={settings}
+            rates={rates}
             onUpdate={handleUpdateSettings}
           />
 
