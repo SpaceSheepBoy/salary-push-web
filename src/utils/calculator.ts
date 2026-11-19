@@ -472,23 +472,18 @@ export class EarningsCalculator {
 
   paydayCountdown(now: Date = new Date()): { days: number; hours: number; isEndOfMonth: boolean; displayLabel: string } {
     const rawDay = this.settings.paydayDay;
-    const isEndOfMonth = rawDay === 0 || !rawDay || rawDay > 30;
+    const isEndOfMonth = !Number.isInteger(rawDay) || rawDay < 1 || rawDay > 30;
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const paydayInMonth = (targetMonth: number) => {
+      const lastDay = new Date(year, targetMonth + 1, 0).getDate();
+      const day = isEndOfMonth ? lastDay : Math.min(rawDay, lastDay);
+      return new Date(year, targetMonth, day);
+    };
 
-    let target: Date;
-    if (isEndOfMonth) {
-      // Last day of current month (e.g. Feb 28, Apr 30, May 31)
-      const lastDayCurrent = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-      if (now.getTime() >= lastDayCurrent.getTime() - 86400000) {
-        // Today is the last day or past it, target last day of next month
-        target = new Date(now.getFullYear(), now.getMonth() + 2, 0, 0, 0, 0);
-      } else {
-        target = new Date(now.getFullYear(), now.getMonth() + 1, 0, 0, 0, 0);
-      }
-    } else {
-      target = new Date(now.getFullYear(), now.getMonth(), rawDay, 0, 0, 0);
-      if (now.getDate() >= rawDay) {
-        target.setMonth(target.getMonth() + 1);
-      }
+    let target = paydayInMonth(month);
+    if (now.getDate() > target.getDate()) {
+      target = paydayInMonth(month + 1);
     }
 
     const diffSec = Math.max(0, (target.getTime() - now.getTime()) / 1000);

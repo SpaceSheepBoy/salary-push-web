@@ -83,7 +83,7 @@ export interface SalarySettings {
 
   // Extra Features
   isMiniMode: boolean;
-  paydayDay: number; // 1-31, day of month
+  paydayDay: number; // 0 = month end, 1–30 = fixed day (clamped to month end)
   soundEnabled: boolean;
   activeEquivalenceId: string;
   customWishlistName: string;
