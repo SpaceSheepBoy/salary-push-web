@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Play, Square, Coffee } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Square, Coffee } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatCurrencyValue, getCurrencySymbol } from '../utils/constants';
 import { AppLanguage } from '../types';
@@ -12,6 +12,10 @@ interface PaidBreakModalProps {
   lang: AppLanguage;
 }
 
+function secondsSince(startedAt: number): number {
+  return Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+}
+
 export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
   isOpen,
   onClose,
@@ -19,26 +23,31 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
   currency,
   lang,
 }) => {
+  const startedAt = useRef(0);
   const [elapsed, setElapsed] = useState(0);
-  const [isActive, setIsActive] = useState(true);
   const [finishedResult, setFinishedResult] = useState<{ time: string; earned: string } | null>(null);
+  const isFinished = finishedResult !== null;
 
   useEffect(() => {
     if (!isOpen) {
       setElapsed(0);
-      setIsActive(true);
       setFinishedResult(null);
       return;
     }
+    if (isFinished) return;
 
-    let interval: ReturnType<typeof setInterval>;
-    if (isActive) {
-      interval = setInterval(() => {
-        setElapsed((prev) => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isOpen, isActive]);
+    startedAt.current = Date.now();
+    const refresh = () => setElapsed(secondsSince(startedAt.current));
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    const interval = setInterval(refresh, 1000);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [isOpen, isFinished]);
 
   if (!isOpen) return null;
 
@@ -53,15 +62,15 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
   };
 
   const handleStop = () => {
-    setIsActive(false);
+    const finalElapsed = secondsSince(startedAt.current);
+    setFinishedResult({
+      time: formatTimer(finalElapsed),
+      earned: formatCurrencyValue(finalElapsed * perSecondEarnings, currency, 2),
+    });
     confetti({
       particleCount: 80,
       spread: 60,
       origin: { y: 0.6 },
-    });
-    setFinishedResult({
-      time: formatTimer(elapsed),
-      earned: earnedFormatted,
     });
   };
 
@@ -106,23 +115,13 @@ export const PaidBreakModal: React.FC<PaidBreakModalProps> = ({
             </div>
 
             <div className="flex gap-2 justify-center">
-              {isActive ? (
-                <button
-                  onClick={handleStop}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-coral hover:bg-coral/90 text-white font-medium text-sm transition-all"
-                >
-                  <Square className="w-4 h-4 fill-white" />
-                  {lang === 'zh' ? '休息结束，结算收益' : (lang === 'fr' ? 'Terminer la pause' : 'End Break')}
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsActive(true)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-mint hover:bg-mint/90 text-[#091417] font-semibold text-sm transition-all"
-                >
-                  <Play className="w-4 h-4 fill-[#091417]" />
-                  {lang === 'zh' ? '继续休息' : (lang === 'fr' ? 'Reprendre' : 'Resume')}
-                </button>
-              )}
+              <button
+                onClick={handleStop}
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-coral hover:bg-coral/90 text-white font-medium text-sm transition-all"
+              >
+                <Square className="w-4 h-4 fill-white" />
+                {lang === 'zh' ? '休息结束，结算收益' : (lang === 'fr' ? 'Terminer la pause' : 'End Break')}
+              </button>
             </div>
           </>
         ) : (
