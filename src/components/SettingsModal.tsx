@@ -22,6 +22,22 @@ interface SettingsModalProps {
   onUpdate: (newSettings: SalarySettings) => void;
 }
 
+function cleanAmountInput(raw: string): string {
+  return raw.replace(/[^0-9.,]/g, '').replace(/^0+(?=\d)/, '');
+}
+
+function parseAmount(input: string): number {
+  const lastComma = input.lastIndexOf(',');
+  // Preserve comma-grouped whole amounts such as 2,500 and 1,234,567.
+  const hasGroupedCommas = /^[1-9]\d{0,2}(,\d{3})+$/.test(input);
+  const decimalInput = lastComma > input.lastIndexOf('.') && !hasGroupedCommas
+    ? `${input.slice(0, lastComma).replace(/[.,]/g, '')}.${input.slice(lastComma + 1)}`
+    : input.replace(/,/g, '');
+  const [whole, ...fraction] = decimalInput.split('.');
+  const amount = parseFloat(`${whole}.${fraction.join('')}`);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
@@ -44,54 +60,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // Sync state if settings update externally (e.g. clicking autofill defaults or switching country)
   useEffect(() => {
-    if (Number(salaryInput) !== settings.salaryAmount) {
+    if (parseAmount(salaryInput) !== settings.salaryAmount) {
       setSalaryInput(settings.salaryAmount ? settings.salaryAmount.toString() : '');
     }
   }, [settings.salaryAmount]);
 
   useEffect(() => {
-    if (Number(wishlistPriceInput) !== settings.customWishlistPrice) {
+    if (parseAmount(wishlistPriceInput) !== settings.customWishlistPrice) {
       setWishlistPriceInput(settings.customWishlistPrice ? settings.customWishlistPrice.toString() : '');
     }
   }, [settings.customWishlistPrice]);
 
   useEffect(() => {
-    if (Number(wishlistSavedInput) !== (settings.customWishlistSaved || 0)) {
+    if (parseAmount(wishlistSavedInput) !== (settings.customWishlistSaved || 0)) {
       setWishlistSavedInput((settings.customWishlistSaved || 0).toString());
     }
   }, [settings.customWishlistSaved]);
 
   const handleSalaryInputChange = (raw: string) => {
-    // Keep only numbers and single dot
-    let cleaned = raw.replace(/[^0-9.]/g, '');
-    const parts = cleaned.split('.');
-    if (parts.length > 2) {
-      cleaned = parts[0] + '.' + parts.slice(1).join('');
-    }
-    // Remove leading zeros if followed by non-zero digits (e.g. "03500" -> "3500", but keep "0" or "0.")
-    if (/^0[0-9]+/.test(cleaned)) {
-      cleaned = cleaned.replace(/^0+/, '');
-    }
+    const cleaned = cleanAmountInput(raw);
     setSalaryInput(cleaned);
-    if (cleaned === '' || cleaned === '.') {
-      handleChange('salaryAmount', 0);
-    } else {
-      const num = parseFloat(cleaned);
-      if (!isNaN(num)) {
-        handleChange('salaryAmount', num);
-      }
-    }
+    handleChange('salaryAmount', parseAmount(cleaned));
   };
 
   const handleSalaryBlur = () => {
-    if (salaryInput === '' || Number(salaryInput) === 0) {
-      setSalaryInput('0');
-      handleChange('salaryAmount', 0);
-    } else {
-      const num = parseFloat(salaryInput) || 0;
-      setSalaryInput(num.toString());
-      handleChange('salaryAmount', num);
-    }
+    const amount = parseAmount(salaryInput);
+    setSalaryInput(amount.toString());
+    handleChange('salaryAmount', amount);
   };
 
   const adjustSalary = (delta: number) => {
@@ -168,34 +163,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }, [settings.salaryCurrency, settings.salaryInputMode]);
 
   const handleWishlistPriceChange = (raw: string) => {
-    let cleaned = raw.replace(/[^0-9.]/g, '');
-    const parts = cleaned.split('.');
-    if (parts.length > 2) {
-      cleaned = parts[0] + '.' + parts.slice(1).join('');
-    }
-    if (/^0[0-9]+/.test(cleaned)) {
-      cleaned = cleaned.replace(/^0+/, '');
-    }
+    const cleaned = cleanAmountInput(raw);
     setWishlistPriceInput(cleaned);
-    if (cleaned === '' || cleaned === '.') {
-      handleChange('customWishlistPrice', 0);
-    } else {
-      const num = parseFloat(cleaned);
-      if (!isNaN(num)) {
-        handleChange('customWishlistPrice', num);
-      }
-    }
+    handleChange('customWishlistPrice', parseAmount(cleaned));
   };
 
   const handleWishlistPriceBlur = () => {
-    if (wishlistPriceInput === '' || Number(wishlistPriceInput) === 0) {
-      setWishlistPriceInput('0');
-      handleChange('customWishlistPrice', 0);
-    } else {
-      const cleanNum = parseFloat(wishlistPriceInput) || 0;
-      setWishlistPriceInput(cleanNum.toString());
-      handleChange('customWishlistPrice', cleanNum);
-    }
+    const amount = parseAmount(wishlistPriceInput);
+    setWishlistPriceInput(amount.toString());
+    handleChange('customWishlistPrice', amount);
   };
 
   const adjustWishlistPrice = (delta: number) => {
@@ -205,34 +181,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleWishlistSavedChange = (raw: string) => {
-    let cleaned = raw.replace(/[^0-9.]/g, '');
-    const parts = cleaned.split('.');
-    if (parts.length > 2) {
-      cleaned = parts[0] + '.' + parts.slice(1).join('');
-    }
-    if (/^0[0-9]+/.test(cleaned)) {
-      cleaned = cleaned.replace(/^0+/, '');
-    }
+    const cleaned = cleanAmountInput(raw);
     setWishlistSavedInput(cleaned);
-    if (cleaned === '' || cleaned === '.') {
-      handleChange('customWishlistSaved', 0);
-    } else {
-      const num = parseFloat(cleaned);
-      if (!isNaN(num)) {
-        handleChange('customWishlistSaved', num);
-      }
-    }
+    handleChange('customWishlistSaved', parseAmount(cleaned));
   };
 
   const handleWishlistSavedBlur = () => {
-    if (wishlistSavedInput === '' || Number(wishlistSavedInput) === 0) {
-      setWishlistSavedInput('0');
-      handleChange('customWishlistSaved', 0);
-    } else {
-      const cleanNum = parseFloat(wishlistSavedInput) || 0;
-      setWishlistSavedInput(cleanNum.toString());
-      handleChange('customWishlistSaved', cleanNum);
-    }
+    const amount = parseAmount(wishlistSavedInput);
+    setWishlistSavedInput(amount.toString());
+    handleChange('customWishlistSaved', amount);
   };
 
   const adjustWishlistSaved = (delta: number) => {
@@ -746,7 +703,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <input
                     type="text"
                     inputMode="decimal"
-                    pattern="[0-9]*"
                     value={salaryInput}
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => handleSalaryInputChange(e.target.value)}
@@ -866,7 +822,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <input
                       type="text"
                       inputMode="decimal"
-                      pattern="[0-9]*"
                       value={wishlistPriceInput}
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => handleWishlistPriceChange(e.target.value)}
@@ -901,7 +856,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <input
                     type="text"
                     inputMode="decimal"
-                    pattern="[0-9]*"
                     value={wishlistSavedInput}
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => handleWishlistSavedChange(e.target.value)}
