@@ -518,7 +518,7 @@ export class EarningsCalculator {
     todayPercent: number;
   } {
     const name = this.settings.customWishlistName || '我的私人心愿';
-    const rawPrice = Math.max(1, this.settings.customWishlistPrice || 2000);
+    const rawPrice = this.settings.customWishlistPrice > 0 ? this.settings.customWishlistPrice : 2000;
     const rawSaved = Math.max(0, this.settings.customWishlistSaved || 0);
     const wishlistCurr = (this.settings.customWishlistCurrency || this.settings.displayCurrency).toUpperCase();
     const displayCurr = this.settings.displayCurrency.toUpperCase();
@@ -533,9 +533,9 @@ export class EarningsCalculator {
     }
 
     const totalAccumulated = convertedSaved + earnedToday;
-    const progressPercent = Math.min(100, Math.max(0, (totalAccumulated / Math.max(0.01, convertedPrice)) * 100));
-    const savedPercent = Math.min(100, Math.max(0, (convertedSaved / Math.max(0.01, convertedPrice)) * 100));
-    const todayPercent = Math.min(Math.max(0, 100 - savedPercent), Math.max(0, (earnedToday / Math.max(0.01, convertedPrice)) * 100));
+    const progressPercent = Math.min(100, Math.max(0, (totalAccumulated / convertedPrice) * 100));
+    const savedPercent = Math.min(100, Math.max(0, (convertedSaved / convertedPrice) * 100));
+    const todayPercent = Math.min(Math.max(0, 100 - savedPercent), Math.max(0, (earnedToday / convertedPrice) * 100));
     const remainingAmount = Math.max(0, convertedPrice - totalAccumulated);
 
     const formattedPrice = formatCurrencyValue(convertedPrice, this.settings.displayCurrency, 2);
