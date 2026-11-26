@@ -97,16 +97,13 @@ export default function App() {
   };
 
   const calculator = new EarningsCalculator(settings, rates);
-  const now = new Date();
-  const todayEarned = calculator.todayEarnings(now);
 
   return (
     <div className="min-h-screen bg-[#091417] text-white flex flex-col items-center justify-start sm:justify-center px-3 pt-[max(env(safe-area-inset-top),1.25rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)] sm:p-6 antialiased selection:bg-mint/30">
       {isStealthMode ? (
         <StealthView
           onExit={() => setIsStealthMode(false)}
-          todayEarned={todayEarned}
-          currency={settings.displayCurrency}
+          calculator={calculator}
         />
       ) : (
         <>

@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { EyeOff } from 'lucide-react';
 import { formatCurrencyValue, getCurrencySymbol } from '../utils/constants';
+import type { EarningsCalculator } from '../utils/calculator';
 
 interface StealthViewProps {
   onExit: () => void;
-  todayEarned: number;
-  currency: string;
+  calculator: EarningsCalculator;
 }
 
-export const StealthView: React.FC<StealthViewProps> = ({ onExit, todayEarned, currency }) => {
+export const StealthView: React.FC<StealthViewProps> = ({ onExit, calculator }) => {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const currency = calculator.settings.displayCurrency;
+  const todayEarned = calculator.todayEarnings(now);
   const sym = getCurrencySymbol(currency);
   const earnedFormatted = formatCurrencyValue(todayEarned, currency, 2);
 
