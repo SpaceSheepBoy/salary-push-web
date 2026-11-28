@@ -115,7 +115,7 @@ export interface DayStripItem {
 
 export interface NextRestInfo {
   badgeName: string;
-  countdownSeconds: number;
+  countdownSeconds: number | null;
   startDateFormatted: string;
   dayStrips: DayStripItem[];
   isRestingNow?: boolean;

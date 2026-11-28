@@ -70,7 +70,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const benefitFormatted = formatCurrencyValue(benefit.todayAccumulated, settings.displayCurrency, 2);
 
   const restInfo = calculator.nextRestInfo(now);
-  const restCountdown = formatDaysAndTime(restInfo.countdownSeconds, lang);
+  const restCountdown = restInfo.countdownSeconds === null
+    ? null
+    : formatDaysAndTime(restInfo.countdownSeconds, lang);
 
   const tenure = calculator.workTenure(now);
   const retireYears = calculator.yearsUntilRetirement(now);
@@ -298,12 +300,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="flex flex-col gap-1.5 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] text-grayteal">{l10n.nextRest}</span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#362C13] text-amberbadge">
-                  {restInfo.badgeName}
-                </span>
+                {restCountdown && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#362C13] text-amberbadge">
+                    {restInfo.badgeName}
+                  </span>
+                )}
               </div>
 
-              {restInfo.isRestingNow ? (
+              {restCountdown === null ? (
+                <div className="text-sm text-white">{l10n.noRestScheduled}</div>
+              ) : restInfo.isRestingNow ? (
                 <div className="flex items-center gap-1.5 py-0.5">
                   <span className="text-xl">🏖️</span>
                   <span className="font-bold text-amber-300 text-xl tracking-tight">
@@ -322,9 +328,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               )}
 
-              <div className="text-[10px] text-grayteal -mt-1">
-                {restInfo.startDateFormatted}
-              </div>
+              {restCountdown && (
+                <div className="text-[10px] text-grayteal -mt-1">
+                  {restInfo.startDateFormatted}
+                </div>
+              )}
 
               {/* 7-day natural week pill strip (Mon - Sun) */}
               <div className="grid grid-cols-7 gap-1 pt-1">

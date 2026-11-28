@@ -374,7 +374,7 @@ export class EarningsCalculator {
       });
     }
 
-    let foundOffset = 1;
+    let foundOffset = -1;
     let restLength = 1;
 
     for (let dayOffset = 0; dayOffset <= 14; dayOffset++) {
@@ -396,6 +396,10 @@ export class EarningsCalculator {
         }
         break;
       }
+    }
+
+    if (foundOffset === -1) {
+      return { badgeName: '', countdownSeconds: null, startDateFormatted: '', dayStrips: strips };
     }
 
     const restStartDate = new Date(now);
